@@ -1,0 +1,48 @@
+@startuml
+
+title AUTH Message - Diagram
+
+autonumber
+actor User as U
+participant "SharedBoardClient" as Client <<tcpclientserver>>
+participant "RequestMessage" as M <<tcpclientserver>>
+participant "SharedBoardServer" as Server <<tcpclientserver>>
+participant "TcpServerMessageHandler" as Handler <<tcpclientserver>>
+participant "UserManagementService" as Service <<EAPLI_FRAMEWORK>>
+participant "SystemUser" as User <<EAPLI_FRAMEWORK>>
+participant "AuthenticationCredentialHandler" as AuthHandler <<EAPLI_FRAMEWORK>>
+
+
+activate Client
+-> Client : onLoad
+Client --> Server: beginSession()
+U --> Client : enters data (version, code, data)
+U --> Client : submit data
+Client -> M : create
+
+
+Client -> Client: writeInt(messageLength)
+Client -> Client: write(message)
+Client --> Handler:
+
+activate Handler
+Handler -> Handler: readInt(messageLength)
+Handler -> Handler: read(message)
+Handler -> Handler: codeFactory(code, version, data)
+Handler -> Service: userOfIdentity(username)
+Service -> Handler: SystemUser
+Handler -> User: roleTypes()
+User -> Handler: roles
+Handler -> AuthHandler: authenticated(username, password, role)
+AuthHandler -> Handler: true
+Handler -> Handler: sendSuccessResponse(version, outputStream)
+Handler --> Client:
+deactivate Handler
+
+Client -> Client: readInt(messageLength)
+Client -> Client: read(message)
+
+deactivate Server
+Client --> U: shows sucess
+
+@enduml

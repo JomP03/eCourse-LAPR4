@@ -1,0 +1,44 @@
+TITLE:Teste para ver como estao
+HEADER:El real teste for real
+FEEDBACK:ON_SUBMISSION
+GRADINGTYPE:ON_SUBMISSION
+OPENDATE:20/05/2023 13-00
+CLOSEDATE:10/10/2026 13-00
+
+
+SECTIONHEADER: SECTION 1, make sure you take your time !!
+
+SHORT_ANSWER:What is the capital of France?
+ANSW:Paris
+GRADE:10
+
+MULTIPLE_CHOICE:What is the capital of France?
+CORANSW:Paris
+GRADE:10
+ANSW:Paris
+ANSW:Portugal
+
+MATCHING: Match the country with its capital
+MATCHES:France-Paris , United Kingdom-London
+GRADE:10
+
+BOOLEAN:Is the sun a star?
+ANSW:TRUE
+GRADE:10
+
+NUMERICAL:What is the square root of 16?
+ANSW:4
+GRADE:10
+
+SECTIONHEADER: SECTION 2, you sure about your answers on section 1?
+
+MISSING_WORD:eu gosto de [[n]], e tu gostas de [[n]] .
+GRADE:10
+CORANSW:chourico
+ANSW:pao
+ANSW:chourico
+ANSW:trigo
+CORANSW:pao
+ANSW:pao
+ANSW:chourico
+ANSW:trigo

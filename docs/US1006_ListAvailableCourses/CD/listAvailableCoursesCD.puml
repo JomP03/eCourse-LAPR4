@@ -1,0 +1,82 @@
+@startuml
+
+skinparam shadowing false
+left to right direction
+
+title US1006 - Listing Available Courses Class Diagram
+
+package ui {
+
+class ListManagerCoursesUI {
+}
+
+class ListTeacherCoursesUI {
+}
+
+class ListStudentCoursesUI {
+}
+}
+
+
+
+
+package usermanagement {
+    package repository {
+        interface IUserRepository {
+        }
+    }
+    package application{
+        class UserSessionService{
+        +getLoggedUser() : eCourseUser
+        }
+    }
+}
+
+package coursemanagement {
+
+package application {
+
+class ListManagerCoursesController {
++findAllCourses(): Iterable<Course>
+}
+
+class ListTeacherCoursesController {
++findCourses(): Iterable<Course>
+}
+
+class ListStudentCoursesController {
++findCourses(): Iterable<Course>
+}
+
+interface IStudentCoursesProvider{
+    +provideStudentCourses(eCourseUser): Iterable<Course>
+    +provideCoursesToEnroll(): Iterable<Course>
+    +provideStudentAvailableCourses(eCourseUser) : Iterable<Course>
+    +filterCourses(studentCourses, coursesToEnroll): Iterable<Course>
+}
+}
+package repository{
+    interface ICourseRepository{
+    +findAll(): Iterable<Course>
+    +findTeacherCourses() :Iterable<Course>
+    +findStudentCourses(eCourseUser) :Iterable<Course>
+    +findCoursesByState(state) :Iterable<Course>
+    }
+}
+
+ListManagerCoursesUI .> ListManagerCoursesController
+ListTeacherCoursesUI .> ListTeacherCoursesController
+ListStudentCoursesUI ..> ListStudentCoursesController
+
+ListManagerCoursesController -> ICourseRepository
+ListTeacherCoursesController --> ICourseRepository
+ListStudentCoursesController --> IStudentCoursesProvider
+ListTeacherCoursesController ---> UserSessionService
+ListStudentCoursesController ---> UserSessionService
+
+UserSessionService -> IUserRepository
+
+IStudentCoursesProvider --> ICourseRepository
+
+
+@enduml

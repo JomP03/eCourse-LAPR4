@@ -1,0 +1,45 @@
+@startuml
+
+title GET Board Request
+
+autonumber
+actor User as U
+participant "Browser" as UI <<ui>>
+participant "HttpRequestHandler" as H <<http>>
+participant "EndpointProcessorFactory" as EPF <<http>>
+participant "HisotryLogEndpointProcessor" as EPP <<http>>
+participant "BoardLogsProvider" as BP <<application>>
+database "BoardLogRepository" as REPO <<repository>>
+
+-> UI : onLoad after selecting\n to view the log of a board
+
+activate UI
+UI -> H : GET /log/{boardId}
+activate H
+H -> EPF : getEndpointProcessor(request)
+activate EPF
+EPF --> H : boardsEndpointProcessor
+deactivate EPF
+H -> EPP : processRequest(request)
+activate EPP
+EPP -> BP : creates(boardLogRepo)
+EPP -> BP : retrieveLogsByBoardID(boardId)
+activate BP
+BP -> REPO : findBoardLogByBoardID(boardId)
+activate REPO
+REPO --> BP : boardLogs
+deactivate REPO
+BP --> EPP : boardLogs
+deactivate BP
+EPP -> EPP : getHistoryLog()
+
+EPP --> EPP : setResponde()
+
+H --> UI : response
+deactivate EPP
+
+UI --> U : shows the history log
+
+
+
+@enduml

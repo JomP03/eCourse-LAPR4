@@ -1,0 +1,32 @@
+@startuml
+
+title Enable User Sequence Diagram
+
+autonumber
+actor Manager as M
+participant "EnableUserUI" as UI <<ui>>
+participant "EnableUserController" as CTRL <<application>>
+participant "ListUsersUI" as LUI <<ui>>
+participant "ECourseUser" as EU <<domain>>
+database "ECourseUserRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+activate UI
+UI -> CTRL : create(userRepo)
+UI -> LUI: listDisabledUsers()
+activate LUI
+LUI --> M : displays the \nlist of users
+deactivate LUI
+M -> UI : selects a user
+UI -> CTRL : enableUser(user)
+activate CTRL
+CTRL -> EU : enable()
+CTRL -> REPO : save(user)
+CTRL --> UI : returns success
+deactivate CTRL
+UI --> M : displays success
+deactivate UI
+
+
+@enduml

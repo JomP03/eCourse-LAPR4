@@ -1,0 +1,48 @@
+@startuml
+
+title Create a Course - Diagram
+
+autonumber
+actor Manager as M
+participant "CreateCourseUI" as UI <<UI>>
+participant "CreateCourseController" as Controller <<Application>>
+participant "CourseBuilder" as CB <<Domain>>
+participant "Course" as C <<Domain>>
+database "CourseRepository" as CRepo <<Persistence>>
+
+
+activate UI
+M --> UI : enters data (name, code, description)
+M --> UI : submit data
+
+
+UI -> Controller: createCourse(name, code, description, minNrEnrolledStudents, maxNrEnrolledStudents)
+activate Controller
+
+Controller -> CB: withCourseCode(code)
+activate CB
+Controller -> CB: withCourseName(name)
+Controller -> CB: withCourseDescription(description)
+Controller -> CB: withMinNrEnrolledStudents(minNrEnrolledStudents)
+Controller -> CB: withMaxNrEnrolledStudents(maxNrEnrolledStudents)
+Controller -> CB: build()
+
+CB -> CRepo: ofIdentity(code)
+activate CRepo
+CRepo -> CB: returns course
+deactivate CRepo
+CB -> C: create
+CB -> Controller: returns course
+deactivate CB
+
+
+
+Controller -> CRepo: save(course)
+activate CRepo
+CRepo -> Controller: returns sucess
+deactivate CRepo
+Controller -> UI: returns sucess
+deactivate Controller
+UI --> M: shows sucess
+
+@enduml

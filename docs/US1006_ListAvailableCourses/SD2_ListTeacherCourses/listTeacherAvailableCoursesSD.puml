@@ -1,0 +1,40 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title UC1006.2 - List Teacher Available Courses
+
+autonumber
+actor Teacher as T
+participant "ListTeacherCoursesUI" as UI <<ui>>
+participant "ListTeacherCoursesController" as TC <<application>>
+participant "UserSessionService" as US <<service>>
+database "UserRepository" as UR <<repository>>
+database "CourseRepository" as CR <<repository>>
+
+activate T
+T --> UI : Asks to list all available courses
+activate UI
+UI -> TC : create(courseRepository, userSessionService)
+UI -> TC : findCourses()
+activate TC
+TC -> US : getLoggedUser()
+activate US
+US -> UR : findByEmail(email)
+activate UR
+UR -> US : eCourseUser
+deactivate UR
+US -> TC : eCourseUser
+deactivate US
+TC -> CR : findTeacherCourses(eCourseUser)
+activate CR
+CR -> TC : courses
+deactivate CR
+TC -> UI : courses
+deactivate TC
+UI --> T : display courses
+deactivate UI
+@enduml

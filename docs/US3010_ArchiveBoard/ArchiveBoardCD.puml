@@ -1,0 +1,41 @@
+@startuml
+
+title US3010 - Archive a Board
+
+skinparam shadowing false
+
+left to right direction
+
+package HTTP {
+
+    class ArchiveBoardEndpointProcessor {
+    }
+}
+
+package boardmanagement {
+package Domain{
+    class Board{
+        + archiveBoard(user) : void
+    }
+}
+
+package Application {
+    class ArchiveBoardController {
+        + archiveBoard(board, user) : void
+    }
+}
+
+package repository{
+    interface BoardRepository{
+        + save(board) : void
+    }
+}
+}
+
+ArchiveBoardEndpointProcessor ..> ArchiveBoardController
+ArchiveBoardController --> Board
+ArchiveBoardController --> BoardRepository
+
+
+
+@enduml

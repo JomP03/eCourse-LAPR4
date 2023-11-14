@@ -1,0 +1,69 @@
+@startuml
+
+title Set Course's Teachers
+
+autonumber
+actor Manager as M
+participant "SetCourseTeachersUI" as UI <<ui>>
+participant "SetCourseTeachersController" as CTRL <<application>>
+participant "ListManagerCoursesController" as LCTRL <<application>>
+database "CourseRepository" as CR <<repository>>
+participant "AvailableTeachersService" as ATS <<service>>
+database "IeCourseUserRepository" as IE <<repository>>
+participant "Course" as C <<domain>>
+
+-> UI : onLoad
+
+activate UI
+UI -> CTRL : create(courseRepo,\navailableTeachersSvc)
+UI -> CTRL : notClosedCourses()
+activate CTRL
+CTRL -> LCTRL : findAllNotClosedCourses()
+activate LCTRL
+LCTRL -> CR : findAllNotClosedCourses()
+activate CR
+CR --> LCTRL : courses
+deactivate CR
+LCTRL --> CTRL : courses
+deactivate LCTRL
+CTRL --> UI : courses
+deactivate CTRL
+UI  --> M : lists the\ncourses
+M -> UI : selects the\ncourse
+UI -> CTRL : availableTeachers(course)
+activate CTRL
+CTRL -> ATS : availableTeachers(course)
+activate ATS
+ATS -> IE : findAllTeachers(course)
+activate IE
+IE --> ATS : teachers
+deactivate IE
+ATS -> C : teachers()
+activate C
+C --> ATS : courseTeachers
+deactivate C
+ATS -> ATS : filterTeacherNotInCourse\n(teachers, courseTeachers)
+activate ATS
+deactivate ATS
+ATS --> CTRL : availableTeachers
+deactivate ATS
+CTRL --> UI : availableTeachers
+deactivate CTRL
+loop while wants to add a teacher
+UI --> M : lists the\nteachers
+M -> UI : selects the\nteacher
+UI -> UI : removes teacher from\navailable teachers list
+UI -> CTRL: addTeacherToCourse(teacher, course)
+activate CTRL
+CTRL -> C : addTeacher(teacher)
+activate C
+deactivate C
+CTRL -> CR : save(course)
+CTRL --> UI : returns success
+deactivate CTRL
+UI --> M : displays success\nand asks if wants\nto add another teacher
+end
+
+
+
+@enduml

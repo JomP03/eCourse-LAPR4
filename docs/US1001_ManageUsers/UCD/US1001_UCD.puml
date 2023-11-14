@@ -1,0 +1,26 @@
+@startuml
+
+left to right direction
+title US1001 - ECourseUser Management Use Cases
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+'**********Manager Use cases*************
+:Manager: as M
+
+Usecase MU01 as "Register a Student"
+Usecase MU02 as "Register a Teacher"
+Usecase MU03 as "Register a Manager"
+Usecase MU04 as "Enable a User"
+Usecase MU05 as "Disable a User"
+Usecase MU06 as "List all the Users"
+
+M -d- MU01
+M -d- MU02
+M -d- MU03
+M -d- MU04
+M -d- MU05
+M -d- MU06
+
+@enduml

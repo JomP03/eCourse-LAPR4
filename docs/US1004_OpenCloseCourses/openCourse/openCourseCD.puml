@@ -1,0 +1,53 @@
+@startuml
+
+left to right direction
+
+
+package ui {
+        class OpenCourseUI {
+        }
+    }
+
+package coursemanagement {
+
+
+    package application {
+        interface ChangeCourseStateController {
+            +findCourses() : Iterable<Course>
+            +changeCourseState(course)
+        }
+
+        class OpenCourseController {
+            +findCourses() : Iterable<Course>
+            +changeCourseState(course)
+        }
+
+        class ListCourseByStateService {
+            +findCoursesByState(state) : Iterable<Course>
+        }
+    }
+
+    package repository {
+        interface CourseRepository {
+            +findByState(state): Iterable<Course>
+        }
+    }
+
+    package domain {
+        class Course {
+            +openCourse()
+        }
+    }
+
+
+}
+
+ChangeCourseStateController -|> OpenCourseController
+OpenCourseController -> Course
+OpenCourseUI --> OpenCourseController
+ListCourseByStateService --> CourseRepository
+OpenCourseController -> ListCourseByStateService
+OpenCourseController -> CourseRepository
+CourseRepository -> Course
+
+@enduml

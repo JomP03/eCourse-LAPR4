@@ -1,0 +1,52 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title UC1006.3 - List Student Available Courses
+
+autonumber
+actor Student as S
+participant "ListStudentCoursesUI" as UI <<ui>>
+participant "ListStudentCoursesController" as SC <<application>>
+participant "UserSessionService" as US <<service>>
+database "UserRepository" as UR <<repository>>
+participant "StudentCoursesProvider" as SS <<service>>
+database "CourseRepository" as CR <<repository>>
+
+activate S
+S --> UI : Asks to list all available courses
+activate UI
+UI -> SC : create(courseRepository, userSessionService)
+UI -> SC : findCourses()
+activate SC
+SC -> US : getLoggedUser()
+activate US
+US -> UR : findByEmail(email)
+activate UR
+UR -> US : eCourseUser
+deactivate UR
+US -> SC : eCourseUser
+deactivate US
+SC -> SS : provideStudentAvailableCourses(eCourseUser)
+activate SS
+SS -> SS : provideStudentCourses(eCourseUser)
+SS -> CR : findStudentCourses(eCourseUser)
+activate CR
+CR -> SS : studentCourses
+deactivate CR
+SS -> SS : provideCoursesToEnroll()
+SS -> CR : findCoursesByState(state)
+activate CR
+CR -> SS : coursesToEnroll
+deactivate CR
+SS -> SS : filterCourses(studentCourses, coursesToEnroll)
+SS -> SC : courses
+deactivate SS
+SC -> UI : courses
+deactivate SC
+UI --> S : display courses
+deactivate UI
+@enduml

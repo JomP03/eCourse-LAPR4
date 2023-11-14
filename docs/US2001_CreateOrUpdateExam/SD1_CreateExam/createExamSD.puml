@@ -1,0 +1,72 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+autonumber
+actor Teacher as T
+participant "CreateAutomatedExamUI" as UI <<UI>>
+participant "CreateAutomatedExamController" as CC <<Application>>
+participant "ListTeacherCoursesController" as LC <<Application>>
+database "CourseRepository" as CR <<Repository>>
+participant "ExamHandler" as HS <<Service>>
+participant "ExamParseTreeVisitor" as PT <<Service>>
+participant "AutomatedExamBuilder" as EB <<Builder>>
+database "ExamRepository" as ER <<Repository>>
+participant "AutomatedExam" as E <<Domain>>
+
+
+activate T
+T --> UI : Asks to create an exam
+activate UI
+UI -> CC : teacherCourses()
+activate CC
+CC -> LC : findCourses()
+activate LC
+LC -> CR : findTeacherCourses()
+activate CR
+CR -> LC : returns courseList
+deactivate CR
+LC -> CC : returns courseList
+deactivate LC
+CC -> UI : courseList
+deactivate CC
+UI -> UI : display courseList
+T --> UI : provides the course\n to create the exam
+UI --> T : asks to insert a file\n with the necessary data
+T --> UI : provides the file with the\n necessary data
+UI -> CC : createAutomatedExam(filePath, selectedCourse)
+activate CC
+CC -> HS : parseAutomatedExam(filePath, selectedCourse, examCreator)
+activate HS
+HS -> PT : visit(tree)
+HS -> PT : getExamBuilder()
+activate PT
+PT -> HS : returns examBuilder
+deactivate PT
+HS -> EB: withCreator(teacher)
+HS -> EB: withCourse(selectedCourse)
+HS -> EB : build()
+activate EB
+EB -> ER : findByTitle(examTitle)
+activate ER
+ER -> EB : returns null
+deactivate ER
+EB -> E : create
+EB -> HS : returns exam
+deactivate EB
+HS -> CC : returns exam
+deactivate HS
+CC -> ER : save(exam)
+activate ER
+ER -> CC : returns success
+deactivate ER
+CC -> UI : returns success
+deactivate CC
+UI --> T : shows success
+
+deactivate UI
+
+@enduml

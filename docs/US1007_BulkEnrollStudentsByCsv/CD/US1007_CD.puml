@@ -1,0 +1,66 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US1007 - Bulk Enroll Students By CSV
+
+package ecourseusermanagement{
+
+    package repositories{
+        class IeCourseUserRepository{
+            +findByEmail(email) : Optional<ECourseUser>
+        }
+    }
+}
+
+package enrolledstudentsmanagement{
+
+    package application {
+
+        class BulkEnrollStudentsCsvController {
+            +BulkEnrollStudentsCsvController(listCoursesByStateSvc, csvBulkStudentsEnroller)
+            +bulkEnrollStudents(course, csvFile) : BulkEnrollStudentsReport
+            +listEnrollableCourses() : Iterable<Course>
+        }
+
+        class RegisterEnrolledStudentController{
+            + RegisterEnrolledStudentController(enrolledStudentsRepository)
+            + registerEnrolledStudent(eCourseUser, course) : EnrolledStudent
+        }
+
+        interface ICsvBulkStudentsEnroller {
+            +bulkEnrollStudents(course, csvFile) : BulkEnrollStudentsReport
+        }
+    }
+
+
+    package dto {
+        class BulkEnrollStudentsReport {
+            +numberOfTotalLines : int
+            +numberOfEnrollmentsCreated : int
+            +numberOfStudentsAlreadyEnrolled : int
+            +notImportedLines : List<String>
+        }
+    }
+}
+
+package coursemanagement{
+    package application{
+       interface IListCoursesByStateService{
+            +listCoursesByState() : Iterable<Course>
+        }
+    }
+}
+
+package ui {
+    class BulkEnrollStudentsCsvUI {
+    }
+}
+
+BulkEnrollStudentsCsvUI ..> BulkEnrollStudentsCsvController
+BulkEnrollStudentsCsvController ..> ICsvBulkStudentsEnroller
+ICsvBulkStudentsEnroller --> BulkEnrollStudentsReport
+ICsvBulkStudentsEnroller ..> RegisterEnrolledStudentController
+ICsvBulkStudentsEnroller .d..> IeCourseUserRepository
+BulkEnrollStudentsCsvController ....> IListCoursesByStateService
+
+@enduml

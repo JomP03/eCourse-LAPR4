@@ -1,0 +1,235 @@
+@startuml
+
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package ui {
+
+    class ScheduleMeetingUI {}
+
+}
+
+package meetingmanagement {
+
+    package application {
+
+        class ScheduleMeetingController {
+            - verifyLoggedUser(): void
+            + ScheduleMeetingController(userSessionService, listUsersController, meetingScheduler): void
+            + listInvitableUsers(): Iterable<eCourseUser>
+            + scheduleMeeting(meetingOwner, duration, date, toInviteECourseUsers): void
+        }
+
+        interface IMeetingScheduler {
+            + scheduleMeeting(meetingOwner, duration, date, toInviteECourseUsers): void
+        }
+
+        interface IUserAvailabilityService {
+            isUserAvailable(dateTime, duration, user): boolean
+        }
+
+        interface IMeetingAvailabilityService {
+            hasMeeting(dateTime, duration, user): boolean
+        }
+
+    }
+
+    package domain {
+        class Meeting {}
+
+        note right of Meeting
+            Meeting contains an eCourseUser
+        end note
+
+        class MeetingDate {
+            - date: LocalDateTime
+        }
+
+        class MeetingDuration {
+            - duration: Integer
+        }
+
+        class MeetingOwner {
+            - owner: eCourseUser
+        }
+
+        enum MeetingStatus {
+            SCHEDULED
+            CANCELED
+            FINISHED
+        }
+    }
+
+    package repository {
+
+        interface IMeetingRepository {
+            + findMeetingsByOwner(user): Iterable<Meeting>
+        }
+
+    }
+
+}
+
+package meetinginvitationmanagement {
+
+    package application {
+
+        interface IMeetingInvitationSender {
+
+            sendInvitation(userToInvite, meeting): void
+
+        }
+
+    }
+
+    package domain {
+
+        class MeetingInvitation {}
+
+        note top of MeetingInvitation
+                    Meeting invitation contains an eCourseUser
+        end note
+
+        enum InvitationStatus {
+            PENDING
+            ACCEPTED
+            DECLINED
+        }
+
+    }
+
+    package repository {
+
+        interface IMeetingInvitationRepository {
+            + findMeetingsByInvitedUser(userToCheck): Iterable<Meeting>
+            + findMeetingInvitationByECourseUserAndMeeting(eCourseUser, meeting)
+        }
+
+    }
+
+}
+
+package classmanagement {
+
+    package application {
+
+        interface IClassAvailabilityService {
+            + hasClass(dateTime, duration, user)
+        }
+
+        interface IUserClassesProviderFactory {
+            + createListTeacherClassesService(): IListTeacherClassesService
+            + createListStudentClassesService(): IListStudentClassesService
+        }
+
+        interface UserClassesProvider {
+            + listUserExtraClasses(course, dateTime, user): Iterable<Class>
+            + listUserRecurrentClasses(course, dateTime, user): Iterable<Class>
+        }
+
+    }
+
+    package repository {
+
+        interface IClassRepository {
+            + findByStudentCourse(course): Iterable<Class>
+            + findByTeacherCourse(course, teacher): Iterable<Class>
+        }
+
+    }
+
+}
+
+package coursemanagement {
+
+    package application {
+
+       interface IUserCoursesProviderFactory {
+           + createListTeacherCoursesService(): createListStudentCoursesService
+           + createListStudentCoursesService(): createListTeacherCoursesService
+       }
+
+       interface IUserCoursesProvider {
+           + listUserActiveCourses(user): Iterable<Course>
+       }
+
+    }
+
+    package repository {
+
+        interface ICourseRepository {
+            + findStudentCourses(user): Iterable<Course>
+            + findTeacherCourses(user): Iterable<Course>
+        }
+    }
+
+}
+
+package ecourseusermanagement {
+
+    package application {
+
+        class ListUsersController {
+            + listEnabledUsers(): Iterable<eCourseUser>
+        }
+
+        class UserSessionService {
+            + getLoggedUser(): eCourseUser
+        }
+    }
+
+    package repository {
+
+        interface IECourseUserRepository {
+            + findByEmail(email): eCourseUser
+        }
+    }
+}
+
+' Domain
+MeetingDate --* Meeting
+MeetingDuration --* Meeting
+MeetingOwner "1" --* "1" Meeting
+Meeting --> MeetingStatus
+MeetingInvitation "1" --> "1" Meeting
+MeetingInvitation -> InvitationStatus
+
+ScheduleMeetingUI --> ScheduleMeetingController
+
+ScheduleMeetingController -> IMeetingScheduler
+ScheduleMeetingController -u-> UserSessionService
+ScheduleMeetingController -u-> ListUsersController
+
+IMeetingScheduler -> IMeetingRepository
+IMeetingScheduler --> IUserAvailabilityService
+IMeetingScheduler --> IMeetingAvailabilityService
+IMeetingScheduler --> IClassAvailabilityService
+IMeetingScheduler --> IMeetingInvitationSender
+
+IMeetingInvitationSender --> IMeetingInvitationRepository
+IMeetingInvitationSender --> MeetingInvitation
+
+UserSessionService --> IECourseUserRepository
+ListUsersController --> IECourseUserRepository
+
+IMeetingRepository "1" - "*" Meeting
+
+IUserCoursesProviderFactory --> IUserCoursesProvider
+IUserCoursesProvider -> ICourseRepository
+
+IUserClassesProviderFactory --> UserClassesProvider
+UserClassesProvider -> IClassRepository
+
+IClassAvailabilityService --> IUserCoursesProvider
+IClassAvailabilityService --> UserClassesProvider
+
+IUserAvailabilityService --> IUserCoursesProviderFactory
+IUserAvailabilityService --> IUserClassesProviderFactory
+
+
+@enduml
+

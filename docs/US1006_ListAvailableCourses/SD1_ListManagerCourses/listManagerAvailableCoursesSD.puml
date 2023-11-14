@@ -1,0 +1,32 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+'UC1006.1 - List Manager Available Courses
+
+title UC1006.1 - List Manager Available Courses
+
+autonumber
+actor Manager as M
+participant "ListManagerCoursesUI" as UI <<ui>>
+participant "ListManagerCoursesController" as MC <<application>>
+database "CourseRepository" as CR <<repository>>
+
+activate M
+M --> UI : Asks to list all courses
+activate UI
+UI -> MC : create(courseRepo)
+UI -> MC : findAllCourses()
+activate MC
+MC -> CR : findAll()
+activate CR
+CR -> MC : courses
+deactivate CR
+MC -> UI : courses
+deactivate MC
+UI --> M : display courses
+deactivate UI
+@enduml

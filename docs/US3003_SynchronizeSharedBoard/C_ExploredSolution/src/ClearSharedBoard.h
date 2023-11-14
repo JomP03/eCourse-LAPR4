@@ -1,0 +1,1 @@
+int clearBoard(int *shmfd, SharedBoard **shared_board, sem_t **semaphores, int numberRows, int numberColumns);

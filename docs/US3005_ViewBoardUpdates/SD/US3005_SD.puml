@@ -1,0 +1,47 @@
+@startuml
+
+title GET Board Request
+
+autonumber
+actor Manager as M
+participant "Browser" as UI <<ui>>
+participant "HttpRequestHandler" as H <<http>>
+participant "EndpointProcessorFactory" as EPF <<http>>
+participant "BoardsEndpointProcessor" as EPP <<http>>
+participant "BoardsProvider" as BP <<application>>
+database "BoardRepository" as REPO <<repository>>
+
+-> UI : onLoad after selecting\n a board in the previous page
+
+activate UI
+UI -> H : GET /boards/{boardId}
+activate H
+H -> EPF : getEndpointProcessor(request)
+activate EPF
+EPF --> H : boardsEndpointProcessor
+deactivate EPF
+H -> EPP : processRequest(request)
+activate EPP
+EPP -> BP : creates(boardRepo)
+EPP -> BP : retrieveBoardById(boardId)
+activate BP
+BP -> REPO : ofIdentity(boardId)
+activate REPO
+REPO --> BP : board
+deactivate REPO
+BP --> EPP : board
+deactivate BP
+EPP -> EPP : setResponse()
+activate EPP
+deactivate EPP
+deactivate EPP
+H --> UI : response
+
+UI --> M : shows the board
+
+
+
+
+
+
+@enduml

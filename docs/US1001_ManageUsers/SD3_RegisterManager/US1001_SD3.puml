@@ -1,0 +1,43 @@
+@startuml
+
+title Register Manager Sequence Diagram
+
+autonumber
+actor Manager as M
+participant "RegisterManagerUI" as UI <<ui>>
+participant "RegisterManagerController" as CTRL <<application>>
+participant "ECourseUserBuilderFactory" as FAC <<factory>>
+participant "ManagerBuilder" as BLD <<builder>>
+participant "SystemUser" as SU <<f_entity>>
+participant "ECourseUser" as EU <<domain>>
+database "ECourseUserRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+activate UI
+UI -> CTRL : create(userRepo, userBuilderFactory)
+UI --> M : asks input of\n manager details
+M -> UI : inputs manager details
+UI -> CTRL : registerManager(username, pwd,\n firstName, lastName, email)
+activate CTRL
+CTRL -> FAC : createECourseUserBuilder(role)
+activate FAC
+FAC -> BLD : create
+FAC --> CTRL : builder
+deactivate FAC
+CTRL -> SU : create
+CTRL -> BLD : withSystemUser(sysUser)
+CTRL -> BLD : build()
+activate BLD
+BLD -> EU : create(sysUser, state)
+BLD --> CTRL : user
+deactivate BLD
+CTRL -> REPO : save(user)
+CTRL --> UI : returns success
+deactivate CTRL
+UI --> M : displays success
+
+
+
+
+@enduml

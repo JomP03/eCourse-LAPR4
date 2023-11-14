@@ -1,0 +1,94 @@
+@startuml
+
+left to right direction
+
+
+package ui {
+        class CreateBoardUI {
+        }
+    }
+
+package boardmanagement {
+
+
+    package application {
+        class CreateBoardController {
+            +createBoard(): Board
+        }
+    }
+
+    package repository {
+        interface IBoardRepository {
+            +findByTitle(boardTitle): Board
+        }
+    }
+
+    package domain {
+        class Board {}
+
+        class BoardLine {}
+
+        class BoardLineTitle{}
+
+        class BoardLineNumber{}
+
+        class Row
+
+        class Column
+
+        class BoardTitle {}
+
+        enum BoardState {}
+
+        class BoardLog{}
+
+        class BoardLogTimestamp{}
+
+        class BoardLogComponent{}
+
+        enum BoardLogOperationType{}
+
+        class BoardPermission{}
+
+        enum BoardPermissionType{}
+
+        class BoardCell{}
+
+
+        class BoardBuilder {
+            +withBoardOwner(): BoardBuilder
+            +withBoardTitle(): BoardBuilder
+            +withBoardRowsList(): BoardBuilder
+            +withBoardColumnsList(): BoardBuilder
+            +build(): Board
+        }
+    }
+
+
+}
+
+Board --> BoardState
+Board --> BoardTitle
+Board --> BoardPermission
+Board --> BoardLine
+Board --> BoardCell
+Board --> BoardLog
+BoardBuilder --> Board
+BoardBuilder --> IBoardRepository
+BoardLine --> BoardLineTitle
+BoardLine --> BoardLineNumber
+Row --|> BoardLine
+Column --|> BoardLine
+BoardPermission --> BoardPermissionType
+BoardLog --> BoardLogTimestamp
+BoardLog --> BoardLogComponent
+BoardLog --> BoardLogOperationType
+BoardCell -> Row
+BoardCell --> Column
+
+CreateBoardController --> IBoardRepository
+CreateBoardController --> BoardBuilder
+CreateBoardUI --> CreateBoardController
+IBoardRepository -> Board
+
+@enduml

@@ -1,0 +1,190 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package presentation {
+    class ClassScheduleUI {
+    }
+}
+
+package ecourseclassmanagement {
+
+    package application{
+
+        class ListAvailableClassSlotsController {
+            +getAvailableRecurrentClassSlots(courseList, chosenCourse)
+        }
+
+        class RecurrentClassScheduleController {
+               +scheduleClass(title, course, weekDay, time, duration)
+               +getAvailableRecurrentClassSlots(courseList, chosenCourse)
+               +getAvailableTeacherCourses(): Iterable<Course>
+        }
+
+
+    }
+
+     package repository {
+            interface ClassRepository {
+                +findCourseClasses(course): Iterable<RecurrentClass>
+                +save(class)
+            }
+     }
+
+    package domain {
+
+        package builder{
+
+            class RecurrentClassBuilder {
+                    +withCourse(course)
+                    +withClassTitle(title)
+                    +withClassDuration(duration)
+                    +withTime(time)
+                    +withWeekDay(weekDay)
+                    +withTeacher(teacher)
+                    +build(): RecurrentClass
+            }
+        }
+
+
+        abstract Class {
+
+        }
+
+        class ClassDuration {
+            - duration : Float
+        }
+
+        class ClassTitle {
+            - title : String
+        }
+
+        class RecurrentClass {
+
+        }
+
+        enum RecurrentClassWeekday {
+            MONDAY
+            TUESDAY
+            WEDNESDAY
+            THURSDAY
+            FRIDAY
+        }
+
+
+        class RecurrentClassTime {
+            - time : Time
+        }
+
+        class RecurrentClassOccurrence {
+             - date : Date
+        }
+
+        package services {
+
+            class ClassScheduler {
+                +getAvailableCourseTeacherIntersectionRecurrentSlots(courses,\n user, chosenCourse)
+                +validateRecurrentClass(recurrentClassTime,recurrentClassWeekDay,\nclassCourse,teacher,courses) : boolean
+            }
+        }
+    }
+}
+
+package ecoursecoursemanagement {
+
+    package repository {
+        interface CourseRepository {
+            +findAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+    package domain {
+
+        class Course {
+        }
+
+    }
+
+    package application {
+        class ListTeacherCoursesController {
+            +getAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+}
+
+
+package usermanagement {
+    package repository {
+        interface UserRepository {
+        }
+    }
+
+    package application {
+        class UserSessionService {
+        + findECourseUserByUsername()
+        }
+    }
+
+    package domain {
+        class ECourseUser {
+        }
+    }
+}
+
+package EAPLIFRAMEWORK {
+class SystemUser {
+- username: String
+- password: String
+- name: String
+- Email: String
+- active: boolean
+}
+
+note bottom of SystemUser
+  The properties of the user are simplified.
+  In reality there is actually a Value Object
+  for all the properties, expect the "active".
+  Other not relevant properties are not being shown.
+end note
+
+ClassTitle --* Class
+ClassDuration --* Class
+
+RecurrentClassTime ---* RecurrentClass
+RecurrentClassWeekday ---* RecurrentClass
+RecurrentClassOccurrence "*" -- "1" RecurrentClass
+
+ClassScheduleUI .> RecurrentClassScheduleController
+RecurrentClassScheduleController ...> ListTeacherCoursesController
+RecurrentClassScheduleController ...> ListAvailableClassSlotsController
+RecurrentClassScheduleController -> RecurrentClassBuilder
+RecurrentClassScheduleController -> ClassScheduler
+
+ListAvailableClassSlotsController -> UserSessionService
+UserSessionService -> UserRepository
+UserSessionService --> ECourseUser
+ECourseUser ..> SystemUser
+
+ListAvailableClassSlotsController .> ClassScheduler
+
+ListTeacherCoursesController --> CourseRepository
+ListTeacherCoursesController --> Course
+
+
+RecurrentClassBuilder ---> RecurrentClass
+
+RecurrentClass --|> Class
+
+ClassScheduler -> ClassRepository
+
+Class "*" -- "1" ClassRepository
+Class "*" -- "1" Course
+Class "*" -- "1" ECourseUser
+
+
+@enduml

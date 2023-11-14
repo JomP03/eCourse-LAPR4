@@ -1,0 +1,82 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+autonumber
+actor Teacher as T
+participant "UpdateAutomatedExamUI" as UI <<UI>>
+participant "UpdateAutomatedExamController" as EC <<Application>>
+participant "ListTeacherCoursesController" as LC <<Application>>
+database "CourseRepository" as CR <<Repository>>
+participant "ListCourseExamsController" as LCE <<Application>>
+participant "ExamFileCreator" as FC  <<Service>>
+participant "ExamHandler" as HS <<Service>>
+participant "ExamParseTreeVisitor" as PT <<Service>>
+participant "AutomatedExamBuilder" as EB <<Builder>>
+participant "ExamRepository" as ER <<Repository>>
+participant "AutomatedExam" as AE <<Domain>>
+
+
+T --> UI : asks to update an automated exam
+activate UI
+UI -> EC : findAutomatedExams()
+activate EC
+EC -> LCE : findTeacherAutomatedExams(examCreator)
+activate LCE
+LCE -> EC : returns examList
+deactivate LCE
+EC -> UI : examList
+deactivate EC
+UI --> T : shows a list of exams for the selected course\n and asks to select one
+T --> UI : selects the exam to be updated
+UI --> T : asks to choose a directory\n to store the exam file
+T --> UI : chooses a directory
+UI -> EC : createExamFileFromAutomatedExam(selectedExam, path, fileName)
+activate EC
+EC -> FC : createExamFile(selectedExam, path, fileName)
+activate FC
+FC -> EC : returns success
+deactivate FC
+EC -> UI : returns success
+deactivate EC
+UI --> T : shows success and asks to provide\n the same file after edited
+T --> UI : sends the updated exam file
+UI -> EC : updatedAutomatedExam(filePath, selectedCourse, exam)
+activate EC
+EC -> HS : parseAutomatedExam(filePath, selectedCourse, examCreator)
+activate HS
+HS -> PT : visit(tree)
+HS -> PT : getExamBuilder()
+activate PT
+PT -> HS : returns examBuilder
+deactivate PT
+HS -> EB: withCreator(teacher)
+HS -> EB: withCourse(selectedCourse)
+HS -> EB : build()
+activate EB
+EB -> ER : findByTitle(examTitle)
+activate ER
+ER -> EB : returns null
+deactivate ER
+EB -> AE : create
+EB -> HS : returns exam
+deactivate EB
+HS -> EC : returns automatedExam
+deactivate HS
+EC -> AE : updateAll(automatedExam)
+activate AE
+AE -> EC : returns success
+deactivate AE
+EC -> ER : save(automatedExam)
+activate ER
+ER -> EC : returns success
+deactivate ER
+EC -> UI : returns automatedExam
+deactivate EC
+UI --> T : shows success
+deactivate T
+
+@enduml

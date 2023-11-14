@@ -1,0 +1,123 @@
+@startuml
+
+title Create a Board - Sequence Diagram
+
+autonumber
+actor Teacher as T
+participant "CreateFormativeExamUI" as UI <<UI>>
+participant "CreateFormativeExamController" as Controller <<Application>>
+participant "UserSessionService" as US <<Application>>
+participant "TeacherCourseProvider" as Provider <<Application>>
+participant "FormativeExamBuilder" as Builder <<Domain>>
+participant "QuestionProvider" as QProvider <<Application>>
+database "QuestionRepository" as QRepo <<Repository>>
+participant "FormativeExam" as E <<Domain>>
+database "ExamRepository" as Erepo <<Repository>>
+
+
+
+activate UI
+T --> UI : asks to create a formative exam
+UI --> Controller : create(userSessionService, teacherCourseProvider, questionProvider, formativeExamBuilder)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : returns logged user
+deactivate US
+
+UI -> Controller : listTeacherActiveCourses()
+Controller -> Provider: provideUserActiveCourses(user)
+activate Provider
+Provider -> Controller : returns list of courses
+deactivate Provider
+
+Controller -> UI : return list of courses
+deactivate Controller
+
+UI --> T : shows list of courses
+T --> UI : selects a course
+UI -> Controller : submitCourse(course)
+activate Controller
+Controller -> Builder : withCourse(course)
+activate Builder
+Controller -> Builder : withCreator(user)
+
+deactivate Builder
+deactivate Controller
+
+UI --> T : request data (title, header)
+T --> UI : submit title and header
+UI -> Controller : submitTopSection(title, header, feedbackType, gradingType)
+activate Controller
+Controller -> Builder : withTitle(title)
+activate Builder
+Controller -> Builder : withHeader(header, feedbackType, gradingType)
+deactivate Builder
+deactivate Controller
+
+loop for each section
+UI --> T : request data (sectionDescription, questionType, numberQuestions)
+note right of T: number of questions of questionType type in that section
+T --> UI : submit sectionDescription, questionType, numberQuestions
+end
+
+loop while disapproves exam
+
+UI -> Controller: submitSection(sectionDescription, questionType, numberQuestions)
+activate Controller
+Controller -> QProvider : listQuestionsByType(questionType, numberQuestions)
+activate QProvider
+QProvider -> Controller : returns list of questions
+deactivate QProvider
+
+Controller -> Builder : withSection(sectionDescription, questions)
+activate Builder
+deactivate Builder
+deactivate Controller
+
+UI -> Controller : submitExam()
+activate Controller
+Controller -> Builder : build()
+activate Builder
+Builder -> E : create()
+activate E
+deactivate E
+Builder -> Controller : returns created exam
+deactivate Builder
+Controller -> UI : return created exam
+deactivate Controller
+
+UI --> T : shows created exam
+UI --> T : asks if user is satisfied
+
+alt user does not approve exam
+
+UI -> Controller: removeSections()
+activate Controller
+Controller -> Builder : removeSections()
+activate Builder
+deactivate Builder
+deactivate Controller
+
+note right of T: if the user is not satisfied with the generated exam questions, repeat loop (while disapproves exam)
+else approves exam
+T --> UI : user is satisfied
+
+UI -> Controller : saveExam()
+activate Controller
+Controller -> Erepo : save()
+activate Erepo
+Erepo -> Controller : returns saved exam
+deactivate Erepo
+
+Controller -> UI : return saved exam
+deactivate Controller
+UI --> T : show success
+end
+
+end
+
+
+
+
+@enduml

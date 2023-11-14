@@ -1,0 +1,113 @@
+@startuml
+
+left to right direction
+title Usecase Diagram
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+'**********Manager Use cases*************
+:Manager: as M
+
+Usecase MU01 as "Create a User"
+Usecase MU02 as "Enable a User"
+Usecase MU03 as "Disable a User"
+Usecase MU04 as "List all the Users"
+
+Usecase MC01 as "Create a Course"
+Usecase MC02 as "Open enrollment in a Course"
+Usecase MC03 as "Close enrollment in a Course"
+Usecase MC04 as "Open a Course"
+Usecase MC05 as "Close a Course"
+Usecase MC06 as "Set Courses teachers"
+
+M -d- MU01
+M -d- MU02
+M -d- MU03
+M -d- MU04
+
+M -d- MC01
+M -d- MC02
+M -d- MC03
+M -d- MC04
+M -d- MC05
+M -d- MC06
+
+
+'**********Teacher*************
+:Teacher: as T
+
+Usecase TC01 as "Schedule of a class"
+Usecase TC02 as "Schedule of an extra class"
+Usecase TC03 as "Update schedule of a class"
+Usecase TC04 as "List all exams of its course***"
+Usecase TC05 as "List all the grades of a class, of its course"
+
+Usecase TE01 as "Create an exam"
+Usecase TE02 as "List its course exams"
+
+T -d- TC01
+T -d- TC02
+T -d- TC03
+T -d- TC04
+T -d- TC05
+
+T -d- TE01
+T -d- TE02
+
+'**********Student*************
+:Student: as S
+
+Usecase SC01 as "Request enrollment in a Course"
+Usecase SC02 as "List its grades"
+
+Usecase SE01 as "List its future exams"
+Usecase SE02 as "Take an exam"
+
+S -d- SC01
+S -d- SC02
+
+S -d- SE01
+S -d- SE02
+
+'**********Combined (for all the users)*************
+:User: as U
+U <|-- M
+U <|---- T
+U <|-- S
+
+Usecase UC01 as "List all the courses"
+
+Usecase UB01 as "Create board"
+Usecase UB02 as "Share board with other users"
+Usecase UB03 as "View board"
+Usecase UB04 as "Create a post-it"
+Usecase UB05 as "Update a post-it"
+Usecase UB06 as "Undo a change to a post-it"
+Usecase UB07 as "View board history"
+Usecase UB08 as "Archive a board"
+
+Usecase UM01 as "Schedule a meeting"
+Usecase UM02 as "Cancel a meeting"
+Usecase UM03 as "Accept a meeting"
+Usecase UM04 as "Reject a meeting"
+Usecase UM05 as "List all the meetings' participants (with their response status)"
+
+U -u- UC01
+
+U -u- UB01
+U -u- UB02
+U -u- UB03
+U -u- UB04
+U -u- UB05
+U -u- UB06
+U -u- UB07
+U -u- UB08
+
+U -u- UM01
+U -u- UM02
+U -u- UM03
+U -u- UM04
+U -u- UM05
+
+@enduml

@@ -1,0 +1,71 @@
+@startuml
+
+title Cancel a Meeting
+
+autonumber
+actor User as U
+participant "CancelMeetingUI" as UI <<ui>>
+participant "CancelMeetingController" as CTRL <<application>>
+participant "MeetingProvider" as MP <<application>>
+database "MeetingRepository" as MDB <<repository>>
+participant "MeetingManager" as MM <<domain>>
+participant "Meeting" as M <<domain>>
+participant "MeetingInvitationProvider" as MIP <<application>>
+database "MeetingInvitationRepository" as MIR <<repository>>
+participant "MeetingInvitation" as MI <<domain>>
+
+
+-> UI : onLoad
+
+activate UI
+UI -> CTRL : creates(meetingsProvider, meetingManager)
+UI -> CTRL : listCancelableMeetings()
+activate CTRL
+CTRL -> MP : provideScheduledMeetingsByOwner(user)
+activate MP
+MP -> MDB : findScheduledMeetingByOwner(user)
+activate MDB
+MDB --> MP : meetings
+deactivate MDB
+MP --> CTRL : meetings
+deactivate MP
+CTRL --> UI : meetings
+deactivate CTRL
+UI --> U : lists the meetings
+U -> UI : selects the meeting\n to cancel
+UI -> CTRL : cancelMeeting(meeting)
+activate CTRL
+CTRL -> MM : cancelMeeting(meeting)
+activate MM
+MM -> M : cancel()
+activate M
+deactivate M
+MM -> MDB : save(meeting)
+MM -> MIP : provideMeetingInvitationsByMeeting(meeting)
+activate MIP
+MIP -> MIR : findMeetingInvitations(meeting)
+activate MIR
+MIR --> MIP : meeting invitations
+deactivate MIR
+MIP --> MM : meeting invitations
+deactivate MIP
+loop for each meeting invitation
+    MM -> MI : cancel()
+    activate MI
+    deactivate MI
+    MM -> MIR : save(meetingInvitation)
+end
+deactivate MM
+deactivate CTRL
+UI --> U : displays success
+deactivate UI
+
+
+
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,76 @@
+@startuml
+
+left to right direction
+
+package ui {
+
+    class UpdateFormativeExamUI {}
+
+}
+
+package exammanagement {
+
+    package application {
+
+        class UpdateFormativeExamController {
+            + listCreatorFormativeExams(): Iterable<FormativeExam>
+            + defineFormativeExam(formativeExam): void
+            + updateTitle(title): void
+            + updateHeader(newHeader, newGradingFeedback, newFeedbackType): void
+            + updateSectionDescription(section, sectionDescription): void
+            + updateQuestion(section, question): void
+            + updateQuestions(section): void
+        }
+
+        interface QuestionProvider {
+            + updateSingleQuestion(questionType, listQuestions, index): void
+            + replaceAllSectionQuestions(questionType, numberQuestions): void
+            - randomQuestion(questionsList): Question
+            - isThereEnoughQuestionsToReplaceSectionQuestions(questionType, numberOfSectionQuestions, numberOfQuestionsToReplace): List<Question>
+            - replaceQuestion(questionsFromRepo, questions, questionIndex): void
+        }
+
+    }
+
+    package domain {
+        class FormativeExam {
+            + updateTitle(title): void
+            + updateHeader(header): void
+            + updateSectionDescription(sectionDescription, section): void
+            + updateSectionQuestions(section, sectionQuestions): void
+        }
+    }
+
+    package repository {
+        interface ExamRepository {
+            + findFormativeExamsByCreator(user): Iterable<FormativeExam>
+            + isTitleAlreadyAssigned(title): boolean
+        }
+    }
+}
+
+package questionmanagment {
+
+    interface QuestionRepository {
+        +findAllByType(questionType): Iterable<Question>
+    }
+}
+
+package ecourseusermanagement {
+
+    class UserSessionService {
+        getLoggedUser(): ECourseUser
+    }
+}
+
+UpdateFormativeExamUI --> UpdateFormativeExamController
+UpdateFormativeExamController --> UserSessionService
+UpdateFormativeExamController --> FormativeExam
+UpdateFormativeExamController --> ExamRepository
+UpdateFormativeExamController --> QuestionProvider
+QuestionProvider --> QuestionRepository
+ExamRepository --> FormativeExam
+
+@enduml
+
+@enduml

@@ -1,0 +1,80 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US3005 - View the board real-time
+
+package usermanagement{
+    interface ISessionManager {
+        +login(username, password) : Optional<SessionToken>
+        +logout(sessionToken)
+        +isUserLoggedIn(sessionToken) : boolean
+        +getLoggedUser(sessionToken) : Optional<User>
+    }
+}
+
+package infra {
+    package auth{
+        class SessionToken {}
+        class SessionTokenGenerator {
+            +generateToken() : SessionToken
+        }
+    }
+}
+
+package boardcommunication {
+    package http {
+        class HTTPmessage {
+            -isRequest : boolean
+            -method : String
+            -uri : String
+            -content : byte[]
+            -contentType : String
+            -authorization : String
+            -status : String
+            +HTTPmessage(inputStream)
+            +send(outputStream)
+            +getMethod() : String
+            +getUri() : String
+            +getContent() : byte[]
+            +setContentFromString(content)
+            +setContentFromFile(file)
+        }
+
+        class HttpRequestHandler {
+            +run() : void
+        }
+
+        package endpoints {
+            interface EndpointProcessor {
+                +process(request, response) : void
+            }
+
+            class EndpointProcessorFactory {
+                +getProcessor(request) : EndpointProcessor
+            }
+        }
+    }
+
+    EndpointProcessorFactory ..> EndpointProcessor
+    HttpRequestHandler ..> EndpointProcessorFactory
+    HttpRequestHandler ..> HTTPmessage
+    EndpointProcessorFactory ..> HTTPmessage
+    EndpointProcessor ..> HTTPmessage
+
+    SessionTokenGenerator ..> SessionToken
+    ISessionManager ..> SessionToken
+    ISessionManager ..> SessionTokenGenerator
+
+}
+
+package ecourseusermanagement {
+    package domain {
+        class ECourseUser {}
+    }
+}
+
+ISessionManager ..> ECourseUser
+HttpRequestHandler ..> ISessionManager
+
+
+@enduml

@@ -1,0 +1,159 @@
+@startuml
+
+left to right direction
+title US2004 - Take an AutomatedExam
+
+
+package ui {
+        class TakeAutomatedExamUI {
+        }
+    }
+
+package exammanagement {
+
+    package repository {
+        interface ExamRepository {
+            +findAvailableAutomatedExamsByCourse(course) : List<AutomatedExam>
+        }
+    }
+
+    package domain {
+
+        abstract Exam {}
+
+        class AutomatedExam {}
+
+        class ExamSection {}
+
+        class ExamOpenPeriod{}
+
+        class ExamHeader{}
+
+        class ExamOpenPeriod {}
+
+        enum FeedbackType{}
+
+        enum GradingType{}
+
+    }
+}
+
+package questionmanagement{
+    package domain{
+        abstract Question{}
+        class BooleanQuestion
+        class MultipleChoiceQuestion
+        class MatchingQuestion
+        class NumericalQuestion
+        class MissingWordQuestion
+    }
+}
+
+package coursemanagement {
+
+    package repository {
+        interface CourseRepository {
+            +findAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+    package domain {
+
+        class Course {
+        }
+
+    }
+
+    package application {
+        class ListTeacherCoursesController {
+            +getAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+}
+
+package takenexammanagement {
+    package domain {
+        class TakenExam{}
+
+        class AnsweredQuestion {}
+
+        class TakenExamBuilder {
+            +withExam(exam) : TakenExamBuilder
+            +withStudent(student) : TakenExamBuilder
+            +withAnsweredQuestion(answeredQuestion) : TakenExamBuilder
+            +build() : TakenExam
+        }
+    }
+
+    package application {
+
+        class TakeAutomatedExamController {
+               +availableAutomatedExams() : List<AutomatedExam>
+               -verifyUser()
+               -isExamAlreadyTaken() : Boolean
+               +studentInProgressCourses() : List<Course>
+               +createTakenExam(exam) : TakenExam
+               +createExamFile(exam, path) : File
+               +correctExam(exam) : TakenExam
+        }
+
+        class TakenExamHandler {
+            +createTakenExam(file) : TakenExam
+        }
+
+        class TakenExamVisitor {
+            +visit(tree)
+            +takenExamBuilder() : TakenExamBuilder
+        }
+
+        class TakenExamCorrector {
+            correctExam(takenExam) : grade
+        }
+
+    }
+
+    package repository {
+        interface TakenExamRepository {
+            +save(takenExam) : TakenExam
+        }
+    }
+}
+
+TakeAutomatedExamUI ---> TakeAutomatedExamController
+
+
+TakeAutomatedExamController --> ExamRepository
+TakeAutomatedExamController -> TakenExamHandler
+TakeAutomatedExamController --> ListTeacherCoursesController
+TakeAutomatedExamController -> TakenExamCorrector
+TakeAutomatedExamController --> TakenExamRepository
+
+ExamRepository -> Exam
+
+BooleanQuestion --u|> Question
+MultipleChoiceQuestion -d-|> Question
+MatchingQuestion -l|> Question
+NumericalQuestion ---|> Question
+MissingWordQuestion ---|> Question
+
+CourseRepository --> Course
+ListTeacherCoursesController -> CourseRepository
+
+TakenExamBuilder -> TakenExam
+TakenExamHandler -> TakenExamVisitor
+TakenExamVisitor --> TakenExamBuilder
+
+TakenExam -> AnsweredQuestion
+
+TakenExamCorrector --> Question
+
+Exam --> ExamHeader
+AutomatedExam -|> Exam
+AutomatedExam --> ExamOpenPeriod
+Exam ---> ExamSection
+ExamHeader --> FeedbackType
+ExamHeader -> GradingType
+ExamSection -> Question
+
+@enduml

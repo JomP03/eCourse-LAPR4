@@ -1,0 +1,38 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Accept meeting invitation
+
+participant "ManageMeetingInvitation" as manageUI <<ui>>
+actor "User" as user
+participant "AcceptMeetingInvitationUI" as ui <<ui>>
+participant "AcceptMeetingInvitationController" as controller <<application>>
+participant "MeetingInvitation" as meetingInvitation <<domain>>
+database "MeetingInvitationRepository" as meetingRepository <<repository>>
+
+manageUI -> ui: create(meetingInvitation)
+
+activate ui
+
+ui -> controller: create(meetingRepository)
+activate controller
+ui -> controller: acceptMeetingInvitation(meetingInvitation)
+controller -> meetingInvitation: accept()
+
+note over meetingInvitation: meeting invitation to accept\nmust not be accepted or canceled already
+
+controller -> meetingRepository: save(meetingInvitation)
+activate meetingRepository
+meetingRepository --> controller: meetingInvitation
+deactivate meetingRepository
+
+controller --> ui: return success
+deactivate controller
+
+ui --> user: display success
+
+@enduml

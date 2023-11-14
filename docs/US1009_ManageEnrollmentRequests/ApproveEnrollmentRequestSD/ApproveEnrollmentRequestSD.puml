@@ -1,0 +1,84 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Approve Enrollment Request
+
+participant "ListEnrollmentRequestsUI" as LUI <<ui>>
+actor "Manager" as M
+participant "ApproveEnrollmentRequestUI" as UI <<ui>>
+participant "ApproveEnrollmentRequestController" as Controller <<application>>
+participant "RegisterEnrolledStudentController" as RSC <<application>>
+participant "RejectEnrollmentRequestController" as RController <<application>>
+database "EnrollmentRequestRepository" as ERepo <<repository>>
+participant "EnrollmentRequest" as Er <<domain>>
+
+LUI -> UI: onLoad
+
+activate UI
+
+deactivate ERepo
+
+deactivate Controller
+
+UI --> M: request decision reason
+
+M --> UI: introduce decision reason and submit
+
+UI -> Controller: create(enrollmentRequestRepository, registerEnrolledStudentController, rejectEnrollmentRequestController)
+
+UI -> Controller: approveEnrollmentRequest(selectedEnrollmentRequest, decisionReason)
+
+activate Controller
+
+Controller -> RSC: registerEnrolledStudent(eCourseUser, course)
+
+note right of Controller: For convenience and practicality reasons, the required steps to registerStudentInCourse will be in a separate Sequence Diagram
+
+activate RSC
+
+RSC -> Controller: returns success or failure
+
+deactivate RSC
+
+alt registration failed
+
+Controller -> RController: rejectEnrollmentRequest(enrollmentRequest, decisionReason)
+
+activate RController
+
+note right of Controller: decisionReason is "Student is already enrolled in this course"
+
+RController -> ERepo: save(selectedEnrollmentRequest)
+
+deactivate RController
+
+Controller -> UI: return failure
+
+UI --> M: display failure
+
+end
+
+alt registration succeeded
+
+Controller -> Er: approveEnrollmentRequest(decisionReason)
+
+Controller -> ERepo: save(selectedEnrollmentRequest)
+
+Controller -> UI: return success
+
+deactivate Controller
+
+UI --> M: display success
+
+deactivate UI
+
+deactivate UI
+
+end
+
+@enduml

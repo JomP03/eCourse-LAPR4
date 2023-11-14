@@ -1,0 +1,112 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Create Post-it
+
+actor "User" as user
+participant "Browser" as browser <<HTTP>>
+participant "HttpRequestHandler" as handler <<HTTP>>
+participant "EndpointProcessorFactory" as factory <<HTTP>>
+participant "PostItEndpointProcessor" as processor <<application>>
+participant "CreatePostItController" as controller <<application>>
+participant "BoardSynchronizer" as sync <<application>>
+participant "PostItManager" as manager <<domain>>
+participant "Board" as board <<domain>>
+participant "PostItProvider" as provider <<application>>
+participant "PostItRepository" as repository <<repository>>
+participant "PostIt" as postIt <<domain>>
+participant "BoardLogger" as logger <<application>>
+
+user -> browser: create post-it
+activate browser
+
+browser -> handler:POST /crt
+activate handler
+handler -> factory : getEndpointProcessor(request)
+activate factory
+factory --> handler : createPostItEndpointProcessor
+deactivate factory
+handler -> processor : processRequest(request)
+activate processor
+
+' In the near future, it might be necessary to update this created method.
+' I am not yet sure if it will require both the board and the boardRepository.
+processor -> controller: create(postItRepository, boardLogger, boardSynchronizer, postItManager)
+activate controller
+
+processor -> controller: createPostIt(board, content, color, row, column, boardUser)
+
+controller -> sync: createBoardCellLock(boardId, row, column)
+activate sync
+
+sync --> controller: lockKey
+deactivate sync
+
+controller -> sync: getBoardCellLock(lockKey)
+activate sync
+
+sync --> controller: object
+deactivate sync
+
+note over controller: This is the synchronization process.\nIt is detailed in the readme.md.
+
+controller -> manager: createPostIt(board, row, column, boardUser, content, color)
+activate manager
+
+manager -> board: findCell(row, column)
+activate board
+
+board --> manager: cell
+deactivate board
+
+manager -> provider: hasPostIt(cell)
+activate provider
+
+provider -> repository: findByBoardCell(cell)
+activate repository
+
+repository --> provider: postIt
+deactivate repository
+
+provider --> manager: true/false
+deactivate provider
+
+manager -> postIt: create(cell, content, color, boardUser)
+activate postIt
+
+deactivate postIt
+
+manager -> repository: save(postIt)
+activate repository
+
+repository --> manager: postIt
+deactivate repository
+
+manager --> controller: success
+deactivate manager
+
+controller -> logger: logPostItCreation(board, boardUser)
+activate logger
+
+deactivate logger
+
+note over logger: This process is omitted in the diagram for simplicity.
+
+
+controller --> processor: success
+deactivate controller
+
+processor --> handler: success
+deactivate processor
+
+handler --> browser: success
+deactivate handler
+
+browser --> user: display success
+deactivate browser
+
+@enduml

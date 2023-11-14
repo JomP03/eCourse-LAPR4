@@ -1,0 +1,28 @@
+/*HEADER*/
+.header-info {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 1%;
+    padding-right: 1%;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+.header-container {
+    padding: 0;
+    background-color: #083562;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Add box shadow */
+    height: 4vh;
+    z-index: 2;
+    position: relative;
+}
+
+.header-text-field{
+    color: #ffffff;
+    font-size: 12px;
+}
+
+
+

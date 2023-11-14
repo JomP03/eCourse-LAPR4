@@ -1,0 +1,86 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package http {
+
+    class PostItEndpointProcessor {}
+
+}
+
+package boardmanagement {
+
+    package application {
+
+        class IBoardLogger {
+            + logPostItUndo(board): void
+        }
+
+    }
+
+    package domain {
+
+        class Board {
+            + findCell(row, column): BoardCell
+        }
+    }
+}
+
+package postitmanagement {
+
+    package application {
+
+            class UndoPostItChangeController {
+                + UndoPostItChangeController(postItRepository, boardLogger, boardSynchronizer,postItManager): void
+                + undoPostItChange(board, user, row, column): void
+            }
+
+            class IBoardSynchronizer {
+                + createBoardCellLock(boardId, row, column): String
+                + getBoardCellLock(cellLockKey): Object
+            }
+
+            class IPostItProvider {
+                + providePostItByCell(row, column): PostIt
+            }
+
+        }
+
+        package domain {
+
+            class PostItManager {
+                + undoPostItChange(board, user, row, column)
+            }
+
+            class PostIt {
+                + undoLastChange(user): void
+            }
+        }
+
+        package repository {
+
+            interface PostItRepository {
+                + save(postIt): PostIt
+            }
+
+        }
+
+}
+
+PostItEndpointProcessor ..> UndoPostItChangeController
+
+UndoPostItChangeController --> IBoardSynchronizer
+UndoPostItChangeController --> PostItManager
+UndoPostItChangeController --> PostItRepository
+UndoPostItChangeController ..> IBoardLogger
+
+PostItManager --> IPostItProvider
+PostItManager ..> Board
+PostItManager --> PostIt
+
+@enduml
+

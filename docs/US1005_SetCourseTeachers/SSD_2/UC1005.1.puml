@@ -1,0 +1,20 @@
+@startuml
+
+autonumber
+actor "Manager" as M
+
+activate M
+M -> ":System": asks to add a teacher to a course
+
+activate ":System"
+":System" --> M : presents list of courses that\n are not in closed state
+M -> ":System": selects a course
+":System" --> M : presents list of teachers not assigned to the course
+M -> ":System": selects a teacher
+":System" -> ":System": adds teacher to the\n course's teacher list
+":System" --> M : presents success message
+
+deactivate ":System"
+deactivate M
+
+@enduml

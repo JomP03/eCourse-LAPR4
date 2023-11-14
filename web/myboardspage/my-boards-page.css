@@ -1,0 +1,400 @@
+.boardsLabel {
+    font-size: 2.3em;
+    text-align: center;
+    color: #083562;
+    padding-top: 30px;
+}
+
+.main-container {
+    position: relative;
+    padding-top: 1%;
+    flex-grow: 1;
+}
+
+.boards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a {
+    color: black;
+}
+
+.board-option {
+    width: 200px;
+    height: 180px;
+    background-color: #d5d8dc;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+    transition: ease-in 0.1s;
+}
+
+.board-option:hover {
+    background-color: #c0c3c6;
+}
+
+.board-option:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+.board-option button.plus-button {
+    background-color: #083562;
+    width: 50px;
+    height: 50px;
+    border: none;
+    font-size: 1.5em;
+    color: #d5d8dc;
+    cursor: pointer;
+    transition: ease-in 0.1s;
+    border-radius: 30%;
+    /* Reduce the size of the "+" inside the button */
+    padding: 0 0.2em;
+    margin-bottom: 10px;
+}
+
+.board-option button.plus-button:hover {
+    opacity: 0.8;
+}
+
+.board-option button.plus-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+
+.board-option-title {
+    text-align: center;
+    font-weight: bold;
+}
+
+.board-image {
+    width: 170px;
+    height: 97px;
+    background-color: transparent;
+}
+
+
+.modal {
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #ebebf3;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 470px;
+    height: 400px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 15px;
+    font-family: Montserrat, sans-serif;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+
+.modal h2 {
+    margin-top: 0;
+}
+
+.modal label {
+    margin: 0 auto;
+    display:flex;
+}
+
+.modal input[type="text"],
+.modal input[type="number"] {
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    display:flex;
+    width: 200px;
+}
+
+.modal button {
+    margin: 0 auto;
+    display:flex;
+    padding: 8px 16px;
+    border-radius: 5px;
+    background-color: #083562;
+    color: #fefefe;
+    border: none;
+    font-family: Montserrat, sans-serif;
+}
+
+.modal button:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.modal button:active {
+    transform: translateY(1px);
+    opacity: 0.5;
+}
+
+
+/* Styling for the exit button */
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.backButton {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+/* Responsive Styles */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%;
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 80%;
+        margin: 5% auto;
+        font-size: 14px;
+    }
+}
+
+
+/* New Modal Styles */
+.next-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.next-modal-content {
+    background-color: #ebebf3;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 470px;
+    height: 400px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 15px;
+    font-family: Montserrat, sans-serif;
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.next-modal h2 {
+    margin-top: 0;
+}
+
+.next-modal label {
+    display: block;
+    margin-top: 10px;
+}
+
+.next-modal input[type="text"],
+.next-modal input[type="number"] {
+    border-radius: 5px;
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+}
+
+.next-modal button {
+    width: fit-content;
+    margin: 5px auto -12px;
+    border-radius: 5px;
+    background-color: #083562;
+    color: #fefefe;
+    border: none;
+    font-family: Montserrat, sans-serif;
+}
+
+.next-modal button:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.next-modal button:active {
+    transform: translateY(1px);
+    opacity: 0.5;
+}
+
+.next-modal .backButton {
+    background-color: transparent;
+    color: #083562;
+}
+
+.next-modal .backButton:hover {
+    background-color: transparent;
+    border-radius: 50%;
+    border: 1px solid #083562;
+}
+
+.next-modal .create-button {
+    padding: 8px 16px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateY(-2px);
+}
+
+.next-modal .columns-container {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 250px;
+    justify-content: space-between;
+    overflow: auto;
+    margin-top: 20px;
+}
+
+.next-modal .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.next-modal .column-title {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.next-modal .text-box {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+.next-modal .text-boxes-column {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.next-modal .text-boxes-column:first-child {
+    margin-right: 10px;
+}
+
+/* Responsive Styles */
+
+@media (max-width: 768px) {
+    .next-modal-content {
+        width: 90%;
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .next-modal-content {
+        width: 80%;
+        margin: 5% auto;
+        font-size: 14px;
+    }
+}
+
+.confirmation-modal-content{
+    background-color: #ebebf3;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    height: 250px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 15px;
+    font-family: Montserrat, sans-serif;
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.confirmation-modal-content button {
+    width: fit-content;
+    margin: 5px auto -12px;
+    border-radius: 5px;
+    background-color: #083562;
+    color: #fefefe;
+    border: none;
+    font-family: Montserrat, sans-serif;
+}
+
+.confirmation-modal-content button:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.confirmation-modal-content button:active {
+    transform: translateY(1px);
+    opacity: 0.5;
+}
+
+.confirmation-modal-content .modal-buttons{
+    display: inline-flex;
+    padding: 20px;
+}
+
+/* Responsive Styles */
+
+@media (max-width: 768px) {
+    .confirmation-modal-content {
+        width: 90%;
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-modal-content {
+        width: 80%;
+        margin: 5% auto;
+        font-size: 14px;
+    }
+}

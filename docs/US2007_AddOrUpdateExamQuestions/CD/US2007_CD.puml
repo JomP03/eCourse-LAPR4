@@ -1,0 +1,130 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US2007 - Add/Update Exam Questions
+
+package questionmanagement{
+
+
+
+    package application {
+        class AddTypeQuestionController{
+            AddTypeQuestionController(questionRepo, questionFactory)
+            +addQuestion(questionData) : Optional<Question>
+        }
+
+        class UpdateTypeQuestionController{
+            UpdateTypeQuestionController(questionRepo, questionValidator)
+            +updateQuestion(question), newQuestionData) : Optional<Question>
+            +listQuestions() : List<Question>
+        }
+    }
+
+    package domain {
+
+            interface IQuestionFactory{
+                +createMatchingQuestion(question, quotation, penalty, leftOptions, rightOptions) : MatchingQuestion
+                +createMultipleChoiceQuestion(question, quotation, penalty, options, correctOption) : MultipleChoiceQuestion
+                +createShortAnswerQuestion(question, quotation, penalty, correctAnswer) : ShortAnswerQuestion
+                +createNumericalQuestion(question, quotation, penalty, correctAnswer) : NumericalQuestion
+                +createMissingWordQuestion(question, quotation, penalty, missingWordOptions) : MissingWordQuestion
+                +createBooleanQuestion(question, quotation, penalty, correctAnswer) : BooleanQuestion
+            }
+
+            interface IQuestionValidator{
+                -validate(question) : Question
+            }
+
+            interface IQuestionFileGenerator{
+                +generateQuestionType(questionData) : File
+            }
+
+            abstract Question{
+                +updateQuestion(newQuestionData) : Optional<Question>
+                -question: String
+                -quotation: float
+                -penalty: float
+            }
+
+            enum QuestionType{
+                MATCHING, MULTIPLE_CHOICE, SHORT_ANSWER,\n NUMERICAL, MISSING_WORD, BOOLEAN
+            }
+
+            Question "*" - "1" QuestionType : has >
+
+            class MatchingQuestion{
+                -leftOptions : List<String>
+                -rightOptions : List<String>
+            }
+            class MultipleChoiceQuestion{
+                -options : List<String>
+                -correctOption : String
+            }
+            class ShortAnswerQuestion{
+                -correctAnswer : String
+            }
+            class NumericalQuestion{
+                -correctAnswer : float
+            }
+            class MissingWordQuestion{}
+            class MissingWordOption{
+                -answer : String
+                -optionAnswers : List<String>
+            }
+            class BooleanQuestion{
+                -correctAnswer : boolean
+            }
+
+            Question <|-- MatchingQuestion
+            Question <|-- MultipleChoiceQuestion
+            Question <|-- ShortAnswerQuestion
+            Question <|-- NumericalQuestion
+            Question <|-- MissingWordQuestion
+            Question <|-- BooleanQuestion
+
+            MissingWordQuestion "1" -- "*" MissingWordOption : has >
+
+            IQuestionFactory "1" -- "*" Question : creates >
+            IQuestionFileGenerator "1" -- "1" IQuestionFactory : uses >
+    }
+
+    package repository{
+        interface QuestionRepository{
+            +save(question) : Optional<Question>
+            +findQuestionsByType(type) : Iterable<Question>
+        }
+    }
+
+
+}
+
+
+
+package ui {
+    class AddOrUpdateQuestionUI{}
+    class AddQuestionUI{}
+    class UpdateQuestionUI{}
+    class AddTypeQuestionUI{}
+    class UpdateTypeQuestionUI{}
+}
+
+
+
+AddTypeQuestionController ..> IQuestionFactory
+
+IQuestionFactory ..> IQuestionValidator
+
+AddOrUpdateQuestionUI ..> AddQuestionUI
+AddOrUpdateQuestionUI ..> UpdateQuestionUI
+AddQuestionUI ..> AddTypeQuestionUI
+UpdateQuestionUI ..> UpdateTypeQuestionUI
+
+AddTypeQuestionUI ..> AddTypeQuestionController
+UpdateTypeQuestionUI ..> UpdateTypeQuestionController
+
+AddTypeQuestionController ..> QuestionRepository
+UpdateTypeQuestionController ..> QuestionRepository
+UpdateTypeQuestionController ..> IQuestionValidator
+
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+
+title Update Question
+
+autonumber
+actor Teacher as T
+participant "UpdateQuestionUI" as UI <<ui>>
+participant "UpdateTypeQuestionUI" as TQUI <<ui>>
+participant "UpdateTypeQuestionController" as CTRL <<application>>
+database "QuestionRepository" as REPO <<repository>>
+participant "IQuestionFileGenerator" as G <<application>>
+participant "TypeQuestion" as TQ <<domain>>
+participant "QuestionValidator" as VAL <<domain>>
+
+
+-> UI : onLoad
+
+activate UI
+UI --> T : displays the question types\n
+T -> UI : selects a question type
+UI -> TQUI : creates and displays
+deactivate UI
+activate TQUI
+TQUI -> CTRL : create(questionRepo, questionValidator)
+TQUI -> CTRL : listQuestions()
+activate CTRL
+CTRL -> REPO : findQuestionsByType(type)
+activate REPO
+REPO --> CTRL : returns the questions\nfiltered by type
+deactivate REPO
+CTRL --> TQUI : returns the questions\nfiltered by type
+deactivate CTRL
+TQUI --> T : displays the questions
+T -> TQUI : selects a question
+TQUI --> T : asks for the new data
+T -> TQUI : enters the new data
+
+TQUI -> CTRL : updateQuestion(question, newQuestionData)
+activate CTRL
+CTRL -> G : generateQuestionType(newQuestionData)
+activate G
+G -> CTRL : returns the generated file
+deactivate G
+CTRL -> VAL : validate(filePath)
+activate VAL
+VAL --> CTRL : returns the question
+deactivate VAL
+CTRL -> TQ : updatequestion(questionData)
+activate TQ
+TQ --> CTRL : returns the updated question
+deactivate TQ
+
+CTRL -> REPO : save(question)
+activate REPO
+REPO --> CTRL : returns the save result
+deactivate REPO
+CTRL --> TQUI : returns the save result
+deactivate CTRL
+TQUI --> T : displays a success message
+deactivate TQUI
+
+
+
+
+
+
+
+
+@enduml

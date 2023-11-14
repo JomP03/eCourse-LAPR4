@@ -1,0 +1,20 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+:User: as U
+
+Usecase MU01 as "Accept a meeting invitation"
+Usecase MU02 as "Reject a meeting invitation"
+
+U -d- MU01
+U -d- MU02
+
+@enduml

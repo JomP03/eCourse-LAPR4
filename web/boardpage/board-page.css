@@ -1,0 +1,949 @@
+.main-container {
+    height: 96vh;
+}
+
+.board-container {
+    position: relative;
+    height: 80%;
+    align-items: center;
+    padding-left: 65px;
+}
+
+.board-title {
+    color: #083562;
+    margin-block-start: 0em;
+    padding-top: 20px;
+}
+
+.board-scrl-container {
+    text-align: center;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+.board-header {
+    text-align: center;
+    align-items: center;
+}
+
+.board {
+    display: grid;
+    gap: 7px;
+    align-items: center;
+}
+
+.post-it-buttons {
+    display: none;
+    position: relative;
+    left: 45%;
+    top: 55%;
+    border: none;
+    font-size: 26px;
+    color: white;
+    background-color: rgb(8, 53, 98, 0.70);
+    transition: background-color 0.3s ease-in-out;
+    transition: opacity 0.05s;
+    cursor: pointer;
+}
+
+.post-it-button-text {
+    margin-right: 25px;
+    padding: 5px 15px;
+    border-radius: 15px;
+}
+
+.post-it-button-image {
+    margin-right: 25px;
+    padding: 5px 20px;
+    border-radius: 15px;
+}
+
+.post-it-buttons:hover {
+    background-color: #083562;
+}
+
+.post-it-buttons:active {
+    opacity: 0.5;
+}
+
+.cell {
+    align-items: center;
+    background-color: rgba(163, 206, 241, 0.60);
+    height: 125px;
+    width: 209px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.cell-button {
+    display: none;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20%;
+    border: none;
+    font-size: 26px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    background-color: rgb(8, 53, 98, 0.70);
+    transition: background-color 0.3s ease-in-out;
+    transition: opacity 0.05s;
+    cursor: pointer;
+}
+
+.cell-button:hover {
+    background-color: #083562;
+}
+
+.cell-button:active {
+    opacity: 0.5;
+}
+
+
+.row-title {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    width: 90px;
+    color: #083562;
+}
+
+.column-title {
+    top: 0;
+    padding-bottom: 10px;
+    background-color: transparent;
+    color: #083562;
+    height: 20px;
+    font-weight: bold;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+.modal h3 {
+    margin-top: 0;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    background-color: #083562;
+    color: #fefefe;
+    border: none;
+    font-family: Montserrat, sans-serif;
+}
+
+.modal-buttons button:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.modal-buttons button:active {
+    transform: translateY(1px);
+    opacity: 0.5;
+}
+
+
+#post-it-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    resize: none;
+    box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.30);
+    border: none;
+    width: 260px;
+    height: 438px;
+    padding: 25px 25px 25px 25px;
+    background-color: rgb(235, 235, 243);
+    border-radius: 7px;
+    z-index: 2;
+    display: none;
+    font-family: Montserrat, sans-serif;
+}
+
+#post-it-form > div {
+    position: relative;
+    margin-bottom: 15%;
+    text-align: center;
+}
+
+.text-area-div {
+    height: 30%;
+}
+
+.file-chooser-div {
+    height: 20%;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 3%;
+    border-radius: 5px;
+    color: rgba(235, 235, 243);
+    background-color: #083562;
+    font-weight: bold;
+    padding: 6px;
+    text-align: center;
+}
+
+/* This will act as the arquive selector */
+.file-chooser-label {
+    cursor: pointer;
+    background-color: transparent;
+    display: inline-block;
+}
+
+.file-chooser-label:hover {
+    opacity: 0.8;
+}
+
+.file-chooser-label:active {
+    opacity: 0.5;
+}
+
+#content-area {
+    width: 100%;
+    height: 68%;
+    resize: none;
+    outline: none;
+    border-radius: 2px;
+    border-width: 1px;
+    border-color: rgb(8, 53, 98);
+    padding-left: 8px;
+    background-color: rgba(235, 235, 243, 0.1);
+}
+
+input[type='file'] {
+    display: none;
+}
+
+#color-picker {
+    width: 48%;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.form-buttons {
+    border: none;
+    border-radius: 3px;
+    background-color: rgb(31, 102, 173);
+    color: rgb(235, 235, 243);
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.form-buttons:hover {
+    opacity: 0.8;
+}
+
+.form-buttons:active {
+    opacity: 0.5;
+}
+
+/* Very important, do not delete this!!! */
+/*
+
+Hello dear GaMaVa,
+If you are seeing this for the first time, know that it acts as a selector for the
+archive input. It is a very important part of the code, so please do not delete it.
+It's Z index will be set to 1 so it will always be on top of the other elements.
+For now the only element that has priority over this is the post-it form (z-index = 2).
+
+*/
+#overlay-form, #overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Post-it css */
+.post-it {
+    position: relative;
+    width: 95%;
+    height: 95%;
+    box-shadow: 5px 5px 20px 3px rgba(0, 0, 0, 0.3);
+    margin-left: 4px;
+    margin-top: 4px;
+}
+
+.post-it-content {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.post-it-text {
+    padding-left: 8px;
+    width: 100%;
+    height: 100%;
+    text-rendering: optimizeLegibility;
+    resize: none;
+    outline: none;
+}
+
+.post-it-image {
+    width: 95%;
+    height: 90%;
+    object-fit: cover;
+    margin-top: 3%;
+}
+
+/* Post-it Area Css (it is in here that the user gets the bigger post-it vision) */
+#post-it-area {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.50);
+    border: none;
+    width: 40%;
+    height: 90%;
+    padding: 20px 20px 20px 20px;
+    background-color: rgb(235, 235, 243);
+    border-radius: 7px;
+    z-index: 2;
+}
+
+#post-it-area > div {
+    position: relative;
+}
+
+#post-it-exit-area {
+    position: relative;
+    height: 4%;
+    border: none;
+    text-align: right;
+}
+
+#post-it-row-column-area {
+    position: relative;
+    margin-bottom: 1%;
+    height: 5%;
+    border: none;
+}
+
+.post-it-exit-button {
+    border: none;
+    background-color: rgb(8, 53, 98);
+    color: rgb(235, 235, 243);
+    border-radius: 50%;
+    padding: 5px 9px;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+#post-it-top-area {
+    position: relative;
+    width: 100%;
+    height: 82%;
+    margin-bottom: 3%;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+}
+
+#post-it-bottom-area {
+    position: relative;
+    width: 100%;
+    height: 5%;
+    border: none;
+    text-align: center
+}
+
+.post-it-area-buttons {
+    background-color: rgb(8, 53, 98);
+    border-radius: 7px;
+    border: none;
+    color: rgb(235, 235, 243);
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+}
+
+.post-it-area-buttons:hover, .post-it-exit-button:hover {
+    opacity: 0.8;
+}
+
+.post-it-area-buttons:active, .post-it-exit-button:active {
+    opacity: 0.5;
+}
+
+
+.post-it-delete-button {
+    background-color: rgba(141, 29, 22, 0.7);
+    transition: opacity 0.05s;
+    cursor: pointer;
+}
+
+.post-it-area-disable-buttons {
+    opacity: 0.7;
+    transition: opacity 0.05s;
+}
+
+.post-it-area-disable-buttons:hover {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Post-it Area Css (it is in here that the user gets the bigger post-it vision) */
+.post-it-area-content {
+    background-color: transparent;
+    border: none;
+}
+
+.post-it-area-text {
+    padding-left: 8px;
+    width: 100%;
+    height: 100%;
+    text-rendering: optimizeLegibility;
+    resize: none;
+    outline: none;
+    font-size: 18px;
+}
+
+.post-it-area-image {
+    max-width: 95%;
+    max-height: 90%;
+    cursor: default;
+    object-fit: contain;
+}
+
+.post-it-area-textArea {
+    width: 30px;
+    height: 25px;
+    resize: none;
+    font-size: 14px;
+    padding: 5px;
+    overflow: hidden;
+}
+
+
+.disabled {
+    background-color: #f1f1f1;
+    color: #8b8b8b;
+}
+
+
+/* Board History Container */
+
+.board-history-container {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    max-width: 1000px;
+    max-height: 500px;
+    background-color: #ebebf3;
+    border-radius: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 5px 5px 20px 0px rgba(0, 0, 0, 0.30);
+    z-index: 2;
+    overflow: hidden;
+    font-family:Montserrat, sans-serif;
+}
+
+
+/* HEADER */
+
+.board-history-header {
+    top: 0;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #083562;;
+    z-index: 3;
+    font-family: Montserrat, sans-serif;
+}
+
+.history-close-button {
+    position: absolute;
+    background-color: transparent;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    color: white;
+    border: solid 1px white;
+    border-radius: 50%;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 5px;
+    padding-bottom: 4px;
+}
+
+.history-close-button:hover {
+    opacity: 0.8;
+}
+
+.history-title {
+    padding-top: 20px;
+    padding-right: 50px;
+    font-size: 25px;
+    margin-block-start: 0em;
+    color:white;
+}
+
+.history-header-title:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.sorting-icon {
+    vertical-align: middle;
+    margin-left: 4px;
+    margin-top: -2px; /* Adjust the margin to vertically align the sorting icon */
+}
+
+
+/* TABLE */
+
+.board-history-table-container {
+    width:100%;
+    height :90%;
+    overflow :auto;
+}
+
+.board-history-table-container::-webkit-scrollbar-track {
+    background-color :transparent;
+}
+
+.board-history-table {
+    width :100%;
+    border-collapse :collapse;
+    box-shadow :0 0 20px rgba(0,0,0,0.1);
+    background-color :#fff;
+    border-radius :4px;
+    overflow :auto;
+}
+
+.board-history-table th {
+    padding :12px calc(10px + 1vmin);
+    text-align :center;
+    background-color :#f7f7f7;
+    font-weight :bold;
+    color :#333;
+    position :sticky;
+    top :0 ;
+}
+
+.board-history-table td {
+    padding :12px calc(10px + 1vmin);
+    text-align :center;
+    border-bottom :1px solid #ddd ;
+    max-height :100px ;
+}
+
+.board-history-table tr:hover {
+    background-color :#f5f5f5 ;
+}
+
+.material-icons-outlined {
+    font-size: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.history-label{
+    font-size: 14px;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    color: #083562;
+    font-weight: bold;
+}
+
+.history-label-update{
+    font-size: 14px;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    color: #083562;
+    font-weight: bold;
+}
+
+.history-label-update:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.change-box-container {
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 300px;
+    border-radius: 10px;
+    background-color: #ebebf3;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.change-header{
+    width: 100%;
+    height: 10%;
+    background: transparent;
+    border-radius: 10px 10px 0px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.change-close-button {
+    position: absolute;
+    background-color: transparent;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #083562;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    border: none;
+}
+
+.change-close-button:hover{
+    border: solid 1px #083562;
+    border-radius: 50%;
+}
+
+.change-content-container {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.change-wrapper {
+    display: inline-block;
+    margin-right: 25px;
+    margin-left: 25px;
+}
+
+.content-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color:#083562;
+    font-family: Montserrat, sans-serif;
+}
+
+.content-box {
+    display: block;
+    width: 200px;
+    height: 100px;
+    margin-bottom: 20px;
+    resize: none;
+    border : solid;
+    border-width : 1px;
+    border-radius : 5px;
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+}
+
+
+.position-difference {
+    border : solid;
+    border-width : 1px;
+    border-radius : 5px;
+    padding : 5px;
+}
+
+.position-label {
+    color:#083562;
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+
+}
+
+.position-number {
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+
+
+
+
+
+/* SHARE MODAL */
+
+
+.shareModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-family: Montserrat,sans-serif;
+}
+
+.shareModal-content {
+    background-color: #ebebf3;
+    margin: 11% auto; /* 15% from the top and centered */
+    padding: 20px;
+    max-width: 600px; /* Adjust the value as needed */
+    width: 90%; /* Add this line to limit the width to 90% of the available space */
+    text-align: center;
+    font-size: 15px;
+    border-radius: 15px;
+    position: relative; /* Add position relative to create a stacking context */
+    font-family: Montserrat,sans-serif;
+}
+
+.shareModal h3 {
+    margin-top: 0;
+}
+
+/* Styling for the search box and submit button */
+.shareModal-content input[type="text"] {
+    display: inline-block;
+    width: calc(75% - 5px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.shareModal-content input[type="submit"] {
+    display: inline-block;
+    width: calc(25% - 5px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: Montserrat, sans-serif;
+}
+
+/* Styling for the user list */
+.shareModal-content ul {
+    list-style-type: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Styling for each user item */
+.shareModal-content li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: Montserrat, sans-serif;
+}
+
+/* Styling for the user name */
+.shareModal-content li span:first-child {
+    flex-grow: 1;
+    text-align: left;
+}
+
+/* Styling for the read and write text */
+.shareModal-content li span:nth-child(2),
+.shareModal-content li span:nth-child(3) {
+    flex-basis: 50px; /* Adjust the flex-basis value as needed */
+}
+
+/* Styling for the checkboxes and labels */
+.shareModal-content input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.shareModal-content label {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+/* Styling for the submit button */
+.shareModal-content input[type="submit"] {
+    background-color: #083562;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Styling for the submit button on hover */
+.shareModal-content input[type="submit"]:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.shareModal-content input[type="submit"]:active {
+    transform: translateY(1px);
+    opacity: 0.5;
+}
+
+/* Styling for the exit button */
+.exitButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    /* Styles for screens up to 768px wide */
+    .shareModal-content {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Styles for screens up to 480px wide */
+    .shareModal-content {
+        font-size: 12px;
+    }
+
+    .header-labels div:not(:first-child) {
+        margin: 0px 20px;
+    }
+
+    .header-labels div:not(:first-child) span:first-child {
+        margin-right: 5px;
+    }
+}
+
+.header-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.header-labels div:not(:first-child) {
+    margin: 0px 12px;
+}
+
+.header-labels div:not(:first-child) span:first-child {
+    margin-right: 5px;
+}
+
+.btn-base {
+    display: flex;
+    align-items: center;
+    padding:3px;
+    width: 50px;
+}
+
+.btn-img {
+    width: 15px;
+    height: 20px;
+}
+
+.btn-base .btn-img-hover {
+    width: 15px;
+    height: 20px;
+    display: none;
+}
+
+.btn-base:hover .btn-img {
+    width: 25px;
+    height: 30px;
+    display: none;
+}
+
+.btn-base:hover .btn-img-hover {
+    display: inline;
+}
+
+.btn-text {
+    margin-left: 3px;
+}
+
+/* Board loading overlay */
+#loading-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+}
+
+#loading-overlay-content {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #6096BA; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin1 2s linear infinite;
+}
+
+@keyframes spin1 {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.div-disabled {
+    opacity: 0.5; /* Reduce opacity to indicate disabled state */
+    pointer-events: none; /* Disable mouse events on the div */
+    cursor: not-allowed; /* Change cursor to indicate disabled state */
+}

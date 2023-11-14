@@ -1,0 +1,109 @@
+.exam-title {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5E5DF0;
+    font-family: 'Montserrat', sans-serif;
+    -fx-padding: 10px;
+}
+
+.section-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3e3cae;
+    font-family: 'Montserrat', sans-serif;
+    -fx-padding: 35px 0px 10px 10px;
+}
+
+.question-text {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+    font-family: 'Montserrat', sans-serif;
+    -fx-padding: 25px 0px 10px 10px;
+}
+
+.radio-button {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1a1a1a;
+    -fx-padding: 10 0 0 10px;
+}
+
+
+.text-field {
+    -fx-max-width: 200px;
+    -fx-accent: #007acc;
+    -fx-background-color: #b9b9b9, white;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-background-radius: 0;
+    -fx-translate-x: 10px;
+}
+
+.text-field:focused {
+    -fx-background-color: #007acc, white;
+}
+
+.text-field:focused {
+    -fx-background-color: #007acc, white;
+}
+
+.submit-button {
+    -fx-background-color: #5E5DF0;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    -fx-font-weight: bold;
+    -fx-border-width: 2px;
+    -fx-cursor: hand;
+    -fx-background-radius: 15px;
+    -fx-background-insets: 0px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 0);
+}
+
+.submit-button:hover {
+    -fx-opacity: 0.8;
+}
+
+.submit-button:pressed {
+    -fx-opacity: 0.5;
+}
+
+.matching-missing-labels {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1a1a1a;
+    font-family: 'Montserrat', sans-serif;
+    -fx-padding: 0px 0px 10px 10px;
+}
+
+
+.combo-box .list-cell {
+    -fx-background: white;
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    font-family: 'Montserrat', sans-serif;
+    -fx-padding: 3 0 2 7;
+    -fx-decoration: none;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: white, white;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 4 0 4 5;
+
+    /* No alternate highlighting */
+    -fx-background-color: white;
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected, .combo-box-popup .list-view .list-cell:filled:selected:hover {
+    -fx-background: #abece3;
+    -fx-background-color: #8cb9b3;
+    -fx-text-fill: black;
+}
+
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color: white;
+    -fx-text-fill: #3d9d91;
+}

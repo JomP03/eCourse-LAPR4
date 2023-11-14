@@ -1,0 +1,206 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package presentation {
+    class ExtraClassScheduleUI {
+    }
+}
+
+package ecourseclassmanagement {
+
+    package application{
+
+        class ListAvailableExtraClassSlotsController {
+            +getAvailableExtraClassSlots(startDate, endDate,course,courses)
+        }
+
+        class ExtraClassScheduleController {
+               +scheduleExtraClass()
+               +getAvailableExtraClassSlots()
+               +getAvailableTeacherCourses(): Iterable<Course>
+               +getStudentsFromCourse(course): Iterable<EnrolledStudent>
+        }
+
+
+    }
+
+     package repository {
+            interface ClassRepository {
+                +findCourseClasses(course): Iterable<ExtraClass>
+                +save(class)
+            }
+     }
+
+    package domain {
+
+        package builder{
+
+            class ExtraClassBuilder {
+                    +withCourse(course)
+                    +withClassTitle(title)
+                    +withClassDuration(duration)
+                    +withDate(startDate, endDate)
+                    +withTeacher(teacher)
+                    +build(): ExtraClass
+            }
+        }
+
+
+        abstract Class {
+
+        }
+
+        class ClassDuration {
+            - duration : Float
+        }
+
+        class ClassTitle {
+            - title : String
+        }
+
+        class ExtraClass {
+            - participants : List<ECourseUser>
+        }
+
+        class ExtraClassDate {
+            - startDate : Date
+            - endDate : Date
+        }
+
+        package services {
+
+            class ClassScheduler {
+                +scheduleExtraClass()
+                +getAvailableExtraClassSlots(startDate, endDate,teacher, course,courses)
+                +validateExtraClass() : boolean
+            }
+        }
+    }
+}
+
+package ecoursecoursemanagement {
+
+    package repository {
+        interface CourseRepository {
+            +findAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+    package domain {
+
+        class Course {
+        }
+
+    }
+
+    package application {
+        class ListTeacherCoursesController {
+            +getAvailableTeacherCourses(): Iterable<Course>
+        }
+    }
+
+}
+
+package enrolledstudentmanagement {
+
+    package repository {
+        interface EnrolledStudentRepository {
+            +findStudentsFromCourse(course): Iterable<EnrolledStudent>
+        }
+    }
+
+    package domain {
+
+        class EnrolledStudent {
+        }
+
+    }
+
+    package application {
+        class ListCourseStudentsController {
+            +getStudentsFromCourse(course): Iterable<EnrolledStudent>
+        }
+    }
+
+}
+
+
+package usermanagement {
+    package repository {
+        interface UserRepository {
+        }
+    }
+
+    package application {
+        class UserSessionService {
+        + getLoggedUser()
+        }
+    }
+
+    package domain {
+        class ECourseUser {
+        }
+    }
+}
+
+package EAPLIFRAMEWORK {
+class SystemUser {
+- username: String
+- password: String
+- name: String
+- Email: String
+- active: boolean
+}
+
+note bottom of SystemUser
+  The properties of the user are simplified.
+  In reality there is actually a Value Object
+  for all the properties, expect the "active".
+  Other not relevant properties are not being shown.
+end note
+
+ClassTitle --* Class
+ClassDuration --* Class
+
+ExtraClassDate ---* ExtraClass
+
+ExtraClassScheduleUI ..> ExtraClassScheduleController
+ExtraClassScheduleController ...> ListTeacherCoursesController
+ExtraClassScheduleController ...> ListAvailableExtraClassSlotsController
+ExtraClassScheduleController -> ExtraClassBuilder
+ExtraClassScheduleController -> ClassScheduler
+ExtraClassScheduleController ---> ListCourseStudentsController
+
+ListAvailableExtraClassSlotsController -> UserSessionService
+UserSessionService -> UserRepository
+UserSessionService ---> ECourseUser
+ECourseUser ...> SystemUser
+
+ListAvailableExtraClassSlotsController .> ClassScheduler
+
+ListTeacherCoursesController --> CourseRepository
+ListTeacherCoursesController --> Course
+
+ListCourseStudentsController --> EnrolledStudentRepository
+ListCourseStudentsController --> EnrolledStudent
+
+ExtraClassBuilder ---> ExtraClass
+
+ExtraClass --|> Class
+
+ClassScheduler --> ClassRepository
+
+Class "*" --- "1" ClassRepository
+Class "*" --- "1" Course
+Class "*" -- "1" ECourseUser
+
+EnrolledStudent "1" -- "1" ECourseUser
+EnrolledStudent "1" -- "1" Course
+
+
+@enduml

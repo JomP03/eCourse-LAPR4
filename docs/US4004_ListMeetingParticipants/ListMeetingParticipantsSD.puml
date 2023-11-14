@@ -1,0 +1,57 @@
+@startuml
+
+title US4004 - List Participants of a Meeting
+
+autonumber
+skinparam shadowing false
+
+actor User as U
+participant "ListMeetingParticipantsUI" as UI <<UI>>
+participant "ListMeetingParticipantsController" as MC <<Application>>
+participant "MeetingProvider" as MP <<Service>>
+participant "IMeetingRepository" as MR <<Repository>>
+participant "IMeetingInvitationProvider" as IP <<Service>>
+participant "IMeetingInvitationRepository" as IR <<Repository>>
+
+U --> UI : asks to view a list of\n participants of a meeting
+
+activate UI
+UI -> MC: create(userSessionService, meetingProvider, meetingInvitationProvider)
+note over MC
+"userSessionService" is used to get the logged user
+end note
+UI -> MC: meetingsForUser()
+activate MC
+MC -> MP: provideScheduledMeetingsByOwner(user)
+activate MP
+MP -> MR: findMeetingsByOwner(userToCheck)
+activate MR
+MR -> MP: scheduledMeetingsByOwner
+deactivate MR
+MP -> MC: scheduledMeetingsByOwner
+MC -> MP: provideMeetingsByInvitedUser(user)
+MP -> IR: findAllMeetingsByInvitedUser(userToCheck)
+activate IR
+IR -> MP: meetingsByInvitedUser
+deactivate IR
+MP -> MC: meetingsByInvitedUser
+deactivate MP
+MC -> UI: meetingsForUser
+deactivate MC
+UI --> U: shows list of meetings\n and asks to select one
+U --> UI: selects a meeting
+UI -> MC: findMeetingParticipants(meeting)
+activate MC
+MC -> IP: provideMeetingInvitationsByMeeting(meeting)
+activate IP
+IP -> IR: findMeetingInvitationsByMeeting(meeting)
+activate IR
+IR -> IP: meetingInvitations
+deactivate IR
+IP -> MC: meetingInvitations
+deactivate IP
+MC -> UI: meetingInvitations
+deactivate MC
+UI --> U: shows list of participants\n and their invitation status
+
+@enduml

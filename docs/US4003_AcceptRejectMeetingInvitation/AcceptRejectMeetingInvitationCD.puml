@@ -1,0 +1,98 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package ui {
+
+    class ManageMeetingInvitationUI {}
+
+    class AcceptMeetingInvitationUI {}
+
+    class RejectMeetingInvitationUI {}
+
+}
+
+package meetinginvitationmanagement {
+
+    package application {
+
+        class ManageMeetingInvitationController {
+            - verifyLoggedUser(): void
+            + ScheduleMeetingController(userSessionService, meetingInvitationProvider): void
+            + userMeetingInvitations(user): Iterable<MeetingInvitation>
+            + meetingInvitationOptions(meetingInvitation): Iterable<InvitationStatus>
+        }
+
+        class AcceptMeetingInvitationController {
+            + acceptMeetingInvitation(meetingInvitation): void
+        }
+
+        class RejectMeetingInvitationController {
+            + rejectMeetingInvitation(meetingInvitation): void
+        }
+
+        interface IMeetingInvitationProvider {
+            + provideUserUncancelledMeetingInvitations(user): Iterable<MeetingInvitation>
+        }
+
+    }
+
+    package domain {
+
+        class MeetingInvitation {}
+
+        enum InvitationStatus {
+            PENDING
+            ACCEPTED
+            REJECTED
+        }
+    }
+
+    package repository {
+
+        interface IMeetingInvitationRepository {
+            + save(meetingInvitation): MeetingInvitation
+            + findUserUncancelledMeetingInvitations(user): Iterable<MeetingInvitation>
+        }
+
+    }
+
+}
+
+package ecourseusermanagement {
+
+    package application {
+
+        class UserSessionService {
+            + getLoggedUser(): eCourseUser
+        }
+    }
+
+}
+
+ManageMeetingInvitationUI --> AcceptMeetingInvitationUI
+ManageMeetingInvitationUI --> RejectMeetingInvitationUI
+
+ManageMeetingInvitationUI ..> ManageMeetingInvitationController
+ManageMeetingInvitationController ..> UserSessionService
+ManageMeetingInvitationController -> IMeetingInvitationProvider
+
+IMeetingInvitationProvider .> IMeetingInvitationRepository
+
+AcceptMeetingInvitationUI ..> AcceptMeetingInvitationController
+RejectMeetingInvitationUI ..> RejectMeetingInvitationController
+
+ManageMeetingInvitationController .> MeetingInvitation
+AcceptMeetingInvitationController .> MeetingInvitation
+RejectMeetingInvitationController ...> MeetingInvitation
+
+MeetingInvitation --> InvitationStatus
+
+IMeetingInvitationRepository .u> MeetingInvitation
+
+@enduml
+

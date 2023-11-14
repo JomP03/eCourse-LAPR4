@@ -1,0 +1,46 @@
+@startuml
+
+title US3010 - Archive Board
+
+autonumber
+skinparam shadowing false
+
+actor User as U
+participant "Browser" as UI <<UI>>
+participant "HttpRequestHandler" as RH <<HTTP>>
+participant "EndpointProcessorFactory" as PF <<HTTP>>
+participant "ArchiveBoardEndpointProcessor" as EP <<HTTP>>
+participant "ArchiveBoardController" as AC <<Application>>
+participant "Board" as B <<Domain>>
+participant "BoardRepository" as BR <<Repository>>
+
+U --> UI : asks to archive a board
+activate UI
+UI --> U : asks to confirm action
+U --> UI : confirms action
+UI -> RH : POST /archiveboard
+activate RH
+RH -> PF : getEndpointProcessor(request)
+activate PF
+PF -> RH : archiveBoardEndpointProcessor
+deactivate PF
+RH -> EP : processRequest(request)
+activate EP
+EP -> AC : create(boardRepo)
+note over EP :  The user is sent by a token that identifies him in the system\nand the board is sent by its ID (check US3005 documentation)
+EP -> AC : archiveBoard(board, user)
+activate AC
+AC -> B : archiveBoard(user)
+activate B
+B -> AC : success
+deactivate B
+AC -> BR : save()
+AC -> EP : success
+deactivate AC
+EP -> EP : setResponse()
+RH -> UI : response
+deactivate EP
+UI --> U : redirects to\narchived board page
+
+
+@enduml

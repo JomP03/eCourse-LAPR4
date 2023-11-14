@@ -1,0 +1,124 @@
+@startuml
+
+skinparam handwritten true
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package ui {
+    class EnrollmentRequestUI {
+    }
+}
+
+package enrollmentrequestmanagement {
+    package application {
+        class EnrollmentRequestController {
+            + getAvailableCoursesForTheStudent()
+            + findByEmail()
+            + registerEnrollmentRequest(course)
+        }
+    }
+
+    package domain {
+        class EnrollmentRequest {
+        }
+
+        class EnrollmentRequestState {
+        }
+
+        class EnrollmentRequestBuilder {
+            + withCourse(course)
+            + withECourseUser(eCourseUser)
+            + build()
+        }
+    }
+
+    package repository {
+        interface EnrollmentRequestRepository {
+            +save(enrollmentRequest)
+        }
+    }
+}
+
+package coursemanagement {
+    package application {
+        class ListAvailableCoursesController {
+            +getAvailableCourses()
+        }
+
+        class CourseEnrollmentService {
+            +findByCourseECourseUser(course, eCourseUser)
+        }
+
+}
+
+    package repository {
+        interface CourseRepository {
+            +getAvailableCourses(eCourseUser)
+        }
+    }
+
+    package domain {
+        class Course {
+        }
+    }
+}
+
+package usermanagement {
+    package repository {
+        interface UserRepository {
+        }
+    }
+
+    package application {
+        class UserSessionService {
+        + findECourseUserByUsername()
+        }
+    }
+
+    package domain {
+        class ECourseUser {
+        }
+    }
+}
+
+package EAPLIFRAMEWORK {
+class SystemUser {
+- username: String
+- password: String
+- name: String
+- Email: String
+- active: boolean
+}
+
+note bottom of SystemUser
+  The properties of the user are simplified.
+  In reality there is actually a Value Object
+  for all the properties, expect the "active".
+  Other not relevant properties are not being shown.
+end note
+
+EnrollmentRequestUI --> EnrollmentRequestController
+EnrollmentRequestController ..> ListAvailableCoursesController
+EnrollmentRequestController --> EnrollmentRequestRepository
+EnrollmentRequestController --> EnrollmentRequest
+EnrollmentRequest ..> ECourseUser
+ECourseUser ..> SystemUser
+ListAvailableCoursesController --> CourseRepository
+EnrollmentRequestController ..> UserRepository
+EnrollmentRequestRepository -> EnrollmentRequest
+EnrollmentRequestController ..> CourseEnrollmentService
+CourseEnrollmentService --> CourseRepository
+EnrollmentRequestController --> EnrollmentRequestBuilder
+UserRepository --> ECourseUser
+EnrollmentRequestController ..> UserSessionService
+UserSessionService --> UserRepository
+UserSessionService --> ECourseUser
+CourseEnrollmentService --> Course
+EnrollmentRequest ..> Course
+
+
+@enduml

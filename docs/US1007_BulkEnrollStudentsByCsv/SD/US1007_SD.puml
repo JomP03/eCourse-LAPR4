@@ -1,0 +1,80 @@
+@startuml
+
+title Bulk Enroll Students By CSV
+
+autonumber
+actor Manager as M
+participant "BulkEnrollStudentsCsvUI" as UI <<ui>>
+participant "BulkEnrollStudentsCsvController" as CTRL <<application>>
+participant "ListCourseByStateService" as LSVC <<application>>
+participant "CsvBulkStudentsEnroller" as ENRSVC <<application>>
+participant "RegisterEnrolledStudentController" as RESCTRL <<application>>
+database "IeCourseUserRepository" as IECUR <<repository>>
+participant "BulkEnrollStudentReport" as RP <<dto>>
+
+
+-> UI : onLoad
+
+activate UI
+UI -> CTRL : create(listCoursesByStateSvc,\n csvBulkStudentsEnroller)
+UI -> CTRL : listEnrollableCourses()
+activate CTRL
+CTRL -> LSVC : listCoursesByState\n(CourseState.ENROLL)
+activate LSVC
+LSVC --> CTRL : courses
+deactivate LSVC
+CTRL --> UI : courses
+deactivate CTRL
+UI --> M : lists courses
+M -> UI : selects a course
+UI --> M : asks for a CSV file
+M -> UI : uploads a CSV file
+UI -> CTRL : bulkEnrollStudents(course, csvFile)
+activate CTRL
+CTRL -> ENRSVC : create(userRepo, enrolledStudentRepo)
+CTRL -> ENRSVC : bulkEnrollStudents(course, csvFile)
+activate ENRSVC
+ENRSVC -> RESCTRL : create(enrolledStudentRepo)
+loop while there are lines in the CSV file
+ENRSVC -> RP : create
+ENRSVC -> RP : numberTotalLines++
+
+ENRSVC -> IECUR : findByEmail(email)
+activate IECUR
+IECUR --> ENRSVC : user
+deactivate IECUR
+
+ENRSVC -> ENRSVC : registerEnrolledStudent
+activate ENRSVC
+ENRSVC -> RESCTRL : registerEnrolledStudent(eCourseUser, course)
+activate RESCTRL
+
+alt student isn't enrolled yet
+RESCTRL --> ENRSVC : enrolledStudent
+deactivate RESCTRL
+ENRSVC -> RP : numberOfEnrollmentsCreated++
+else
+ENRSVC -> RP : numberOfStudentsAlreadyEnrolled++
+end
+deactivate ENRSVC
+end
+
+ENRSVC --> CTRL : report
+deactivate ENRSVC
+CTRL --> UI : report
+deactivate CTRL
+UI --> M : displays the report\n and asks if the user\n wants to export it
+alt user wants to export the report
+UI --> M : aks for a file name
+M -> UI : provides a file name
+UI -> UI : exportReport(report, fileName)
+else
+end
+UI --> M : displays a success message
+
+
+
+
+
+
+@enduml

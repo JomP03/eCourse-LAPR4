@@ -1,0 +1,110 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package http {
+
+    class CreatePostItEndpointProcessor {}
+
+}
+
+package boardmanagement {
+
+    package application {
+
+        class CreatePostItController {
+            + ScheduleMeetingController(postItRepository, boardLogger, boardSynchronizer, postItManager): void
+            + createPostIt(board, content, color, row, column, boardUser): void
+        }
+
+        interface IBoardSynchronizer {
+            + createBoardCellLock(boardId, row, column): String
+            + getBoardCellLock(lockKey): Object
+        }
+
+        interface IBoardLogger {
+            + logPostItCreation(board): void
+        }
+    }
+
+    package domain {
+
+        class Board {
+            + findCell(row, column): BoardCell
+        }
+    }
+
+}
+
+package postitmanagement {
+
+    package application {
+
+        class PostItManager {
+            + createPostIt(board, row, column, boardUser, content, color): void
+        }
+
+        interface IPostItProvider {
+            + hasPostIt(cell): boolean
+        }
+
+    }
+
+    package domain {
+
+        class PostIt {
+            + PostIt(cell, content, color, user): void
+            + isOwner(user): boolean
+        }
+
+        class PostItColor {
+        }
+
+        class PostItContent {
+        }
+
+        class PostItTimestamp {
+        }
+
+        class PostItPreviousContent {
+        }
+    }
+
+    package repository {
+
+        interface IPostItRepository {
+            + save(postIt): PostIt
+            + findByBoardCell(cell): PostIt
+        }
+
+    }
+
+
+}
+
+CreatePostItEndpointProcessor ..> CreatePostItController
+
+CreatePostItController --> IBoardSynchronizer
+CreatePostItController --> PostItManager
+CreatePostItController ..> IBoardLogger
+
+PostIt --> PostItColor
+PostIt --> PostItContent
+PostIt --> PostItTimestamp
+PostIt --> PostItPreviousContent
+
+PostItManager ..> Board
+PostItManager --> PostIt
+PostItManager -> IPostItProvider
+PostItManager --> IPostItRepository
+
+IPostItProvider --> PostIt
+
+IPostItRepository -> PostIt
+
+@enduml
+

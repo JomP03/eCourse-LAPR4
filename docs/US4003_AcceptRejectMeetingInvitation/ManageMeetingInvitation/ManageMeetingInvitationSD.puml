@@ -1,0 +1,77 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Manage meeting invitation
+
+actor "User" as user
+participant "ManageMeetingInvitationUI" as ui <<ui>>
+participant "ManageMeetingInvitationController" as controller <<application>>
+participant "UserSessionService" as sessionService <<application>>
+participant "MeetingInvitationProvider" as meetingProvider <<application>>
+database "MeetingInvitationRepository" as repository <<application>>
+participant "AcceptMeetingInvitationUI" as acceptUI <<ui>>
+participant "RejectMeetingInvitationUI" as rejectUI <<ui>>
+
+user -> ui: manage meeting invitation
+
+activate ui
+
+ui -> controller: create(userSessionService, meetingInvitationProvider)
+activate controller
+controller -> sessionService: getLoggedUser()
+activate sessionService
+sessionService --> controller: logged user
+deactivate sessionService
+
+ui -> controller: userMeetingInvitations(user)
+controller -> meetingProvider: provideUserUncancelledMeetingInvitations(user)
+activate meetingProvider
+meetingProvider -> repository: findUserUncancelledMeetingInvitations(user)
+activate repository
+repository --> meetingProvider: meeting invitations
+
+note right of meetingProvider: meeting invitations that have not been cancelled\nand that belong to scheduled meetings
+
+deactivate repository
+meetingProvider --> controller: meeting invitations
+deactivate meetingProvider
+controller --> ui: meeting invitations
+deactivate controller
+ui --> user: display meeting invitations
+
+loop while option != exit
+
+user -> ui: select meeting invitation
+ui -> controller: meetingInvitationOptions(meetingInvitation)
+
+note right of controller: meeting invitation is pending: accept or reject \nmeeting invitation is accepted: reject \nmeeting invitation is rejected: accept
+
+activate controller
+controller --> ui: meeting invitation options
+deactivate controller
+ui --> user: display meeting invitation options
+
+user -> ui: select meeting invitation option
+
+alt option is accept
+
+ui -> acceptUI: create(meetingInvitation)
+
+note right of ui: accept meeting invitation is represented in another diagram
+
+else option is reject
+
+ui -> rejectUI: create(meetingInvitation)
+
+note right of ui: reject meeting invitation is represented in another diagram
+
+end
+
+end
+
+
+@enduml

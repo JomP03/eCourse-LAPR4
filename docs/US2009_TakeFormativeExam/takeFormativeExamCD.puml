@@ -1,0 +1,96 @@
+@startuml
+
+left to right direction
+title US2009 - Take a Formative Exam
+
+
+package ui {
+    class TakeFormativeExamUI {}
+}
+
+package questionmanagement {
+    abstract Question {
+        +corretAnswer(answer) : grade
+    }
+}
+
+package coursemanagement {
+    interface StudentCoursesProvider {
+        +provideStudentInProgressCourses(): Iterable<Course>
+    }
+}
+
+package exammanagement {
+    class CourseExamProvider {
+        +provideCourseExams(course) : Iterable<Exam>
+    }
+}
+
+
+package takenexammanagement {
+    package domain {
+        class TakenExam{}
+
+        class AnsweredQuestion {}
+
+        class TakenExamBuilder {
+            +withExam(exam) : TakenExamBuilder
+            +withStudent(student) : TakenExamBuilder
+            +withAnsweredQuestion(answeredQuestion) : TakenExamBuilder
+            +build() : TakenExam
+        }
+    }
+
+    package application {
+        class TakenExamHandler {
+            +createTakenExam(file) : TakenExam
+        }
+
+        class TakenExamVisitor {
+            +visit(tree)
+            +takenExamBuilder() : TakenExamBuilder
+        }
+
+        class TakenExamCorrector {
+            correctExam(takenExam) : TakenExam
+        }
+
+        abstract TakeExamController {
+           -verifyUser()
+           -isExamAlreadyTaken(exam) : boolean
+           +listStudentInProgressCourses() : List<Course>
+           +listStudentNonTakenFormativeExamsOfAcourse() : List<Exam>
+           +createTakenExam(exam) : TakenExam
+           +correctExam(exam) : float
+        }
+
+    }
+
+    package repository {
+        interface TakeExamRepository {
+            +save(takenExam) : TakenExam
+        }
+    }
+}
+
+TakeFormativeExamUI --> TakeFormativeExamController
+
+TakeFormativeExamController -|> TakeExamController
+TakeFormativeExamController --> TakenExamHandler
+TakeFormativeExamController --> TakenExamCorrector
+TakeFormativeExamController --> StudentCoursesProvider
+TakeFormativeExamController --> CourseExamProvider
+TakeFormativeExamController --> TakeExamRepository
+
+TakenExamHandler -> TakenExamVisitor
+TakenExamHandler --> TakenExamBuilder
+
+TakenExamVisitor -> TakenExamBuilder
+
+TakenExamBuilder -> TakenExam
+
+TakenExamCorrector --> Question
+
+TakenExam -> AnsweredQuestion
+
+@enduml

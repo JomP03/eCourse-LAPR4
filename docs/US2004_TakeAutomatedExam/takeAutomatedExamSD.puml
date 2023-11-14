@@ -1,0 +1,127 @@
+@startuml
+
+autonumber
+
+actor Student as S
+participant "TakeAutomatedExamUI" as UI <<UI>>
+participant "TakeExamController" as Controller <<Application>>
+participant "UserSessionService" as US <<Application>>
+participant "StudentCoursesProvider" as CourseProvider <<Repository>>
+participant "CourseExamProvider" as ExamProvider <<Repository>>
+participant "TakenExamHandler" as Handler <<Domain>>
+participant "TakenExamVisitor" as Visitor <<Domain>>
+participant "TakenExamBuilder" as Builder <<Domain>>
+participant "TakenExam" as TakenExam <<Domain>>
+participant "TakenExamCorrector" as Corrector <<Domain>>
+participant "Question" as Question <<Domain>>
+database "TakenExamRepository" as Erepo <<Repository>>
+
+activate UI
+--> UI : on load
+UI -> Controller : create(userSessionService, courseExamsProvider, studentCoursesProvider)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : returns logged user
+deactivate US
+deactivate Controller
+
+
+UI -> Controller: listStudentCourses()
+activate Controller
+Controller -> CourseProvider : provideStudentInProgressCourses(user)
+activate CourseProvider
+CourseProvider -> Controller : returns courses
+deactivate CourseProvider
+Controller -> UI : returns courses
+deactivate Controller
+
+UI --> S: shows courses
+S --> UI: selects a course
+
+UI -> Controller: listCourseExams(course)
+activate Controller
+Controller -> ExamProvider : provideCourseAutomatedExams(course)
+activate ExamProvider
+ExamProvider -> Controller : returns automated exams
+deactivate ExamProvider
+Controller -> UI : returns automated exams
+deactivate Controller
+
+UI --> S: shows automated exams
+S --> UI: selects a automated exam
+
+    note right of S
+        takes the exams and generates a json file
+        opens the browser to take the exam
+        after taking the exam, a txt will be generated
+        this file will be uploaded to the system
+
+        or
+
+        if in linux, the student will select a directory
+        a txt file with the exam will be generated
+        the student will take the exam and upload the same file
+    end note
+
+UI -> S: requests the file
+S -> UI: uploads the file
+
+UI -> Controller: correctExam(file)
+activate Controller
+Controller -> Handler : createTakenExam(file)
+activate Handler
+Handler -> Visitor : visit(tree)
+activate Visitor
+
+
+Visitor --> Builder : create
+activate Builder
+Visitor -> Builder : withAnsweredQuestion(answeredQuestion)
+deactivate Builder
+
+Handler -> Visitor : takenExamBuilder()
+Visitor -> Handler : returns builder
+deactivate Visitor
+Handler -> Builder : withExam(exam)
+activate Builder
+Handler -> Builder : withStudent(student)
+Handler -> Builder : build()
+
+Builder --> TakenExam : create
+deactivate Builder
+deactivate Visitor
+
+Handler -> Controller: return takenExam
+deactivate Handler
+
+Controller -> Corrector : correct(takenExam)
+activate Corrector
+
+loop for each question
+    Corrector -> Question : correctAnswer(answer)
+
+        note right of Question
+            As the question knows how to correct itself,
+            it will return the points obtained by the student
+        end note
+
+    activate Question
+    Question -> Corrector : returns grade
+end
+
+deactivate Question
+Corrector -> Controller : returns grade
+deactivate Corrector
+
+
+Controller -> Erepo : save(takenExam)
+activate Erepo
+Erepo -> Controller : returns takenExam
+deactivate Erepo
+Controller -> UI : returns takenExam
+deactivate Controller
+UI -> S: displays takenExam (grade and feedback)
+deactivate UI
+
+@enduml

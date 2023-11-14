@@ -1,0 +1,105 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US4002 - Cancel meeting
+
+package ui {
+
+    class CancelMeetingUI {
+    }
+
+}
+
+package meetingmanagement {
+
+    package domain {
+
+        class Meeting {
+            + cancel(): void
+        }
+
+        enum MeetingStatus {
+            PENDING
+            CANCELED
+            FINISHED
+        }
+
+        interface IMeetingManager {
+            + cancelMeeting(meeting): void
+        }
+    }
+
+    package repository {
+
+        interface IMeetingRepository {
+            + findFutureNotCanceledMeetingsByOwner(user): Iterable<Meeting>
+        }
+
+    }
+
+    package application {
+        class CancelMeetingController {
+            + cancelMeeting(meeting): void
+            + listCancelableMeetings(user): Iterable<Meeting>
+        }
+
+
+        interface IMeetingProvider {
+            + provideFutureNotCanceledMeetingsByOwner(user): Iterable<Meeting>
+        }
+                IMeetingProvider .> IMeetingRepository
+
+    }
+
+    Meeting -> MeetingStatus
+    IMeetingRepository -> Meeting
+    CancelMeetingUI ..> CancelMeetingController
+    CancelMeetingController ..> IMeetingProvider
+
+}
+
+package meetinginvitationmanagement {
+
+    package domain {
+
+        class MeetingInvitation {
+            + cancel(): void
+        }
+
+        enum InvitationStatus {
+            PENDING
+            ACCEPTED
+            REJECTED
+            CANCELED
+        }
+    }
+
+    MeetingInvitation -> InvitationStatus
+
+    package repository {
+        interface IMeetingInvitationRepository {
+            + findMeetingInvitations(meeting): Iterable<MeetingInvitation>
+        }
+    }
+
+    package application {
+        interface IMeetingInvitationProvider {
+            + provideMeetingInvitations(meeting): Iterable<MeetingInvitation>
+        }
+    }
+
+    IMeetingInvitationRepository -> MeetingInvitation
+    IMeetingInvitationProvider ..> IMeetingInvitationRepository
+}
+
+IMeetingManager ..> IMeetingProvider
+IMeetingManager ..> IMeetingInvitationProvider
+IMeetingManager ..> IMeetingInvitationRepository
+IMeetingManager ..> IMeetingRepository
+CancelMeetingController ..> IMeetingManager
+IMeetingManager ..> Meeting
+
+
+
+
+@enduml

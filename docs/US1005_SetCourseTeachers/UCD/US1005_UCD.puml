@@ -1,0 +1,18 @@
+@startuml
+
+left to right direction
+title US1005 - Set Course's teachers
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+'**********Manager Use cases*************
+:Manager: as M
+
+Usecase MU01 as "Sets Course's Teacher in charge"
+Usecase MU02 as "Add Teacher to a Course"
+
+M -d- MU01
+M -d- MU02
+
+@enduml

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="board-page.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/base-clean.css">
+    <link rel="stylesheet" href="sidebar/sidebar.css">
+    <link rel="stylesheet" href="../commons/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
+
+
+</head>
+<body onload="checkIfUserIsTheOwner();loadBoardPage();">
+<div class="super-container">
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <!--  MAIN -->
+    <!--  HEADER-->
+    <div class="header-container">
+        <div class="header-info">
+            <h2 class="header-text-field">eCourse</h2>
+            <h2 class="header-text-field" id="username"></h2>
+        </div>
+        <div class="header-separator"></div>
+    </div>
+
+    <ul class="notification-container"></ul>
+
+    <div class="main-container">
+
+        <!--  SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-lateral-separator"></div>
+            <!-- Sidebar header -->
+            <div class="sidebar-header">
+                <div class="sidebar-toggle" onclick="toggleSidebar()">
+                    <img id="sidebar-icon" src="sidebar/collapse-icon.png" alt="Collapsed Icon">
+                </div>
+            </div>
+            <!-- Sidebar content -->
+            <div class="sidebar-content">
+                <div class="sidebar-button" onclick="boardsSidebarButtonAction()">
+                    <img class="button-icon" src="sidebar/boards-icon.png" alt="BoardsIcon">
+                    <span class="button-text">Boards</span>
+                </div>
+                <div class="sidebar-button" onclick="loadBoardHistory()">
+                    <img class="button-icon" src="sidebar/history-icon.png" alt="HistoryIcon">
+                    <span class="button-text">Board History</span>
+                </div>
+            </div>
+        </div>
+
+        <!--  POST-IT FORM -->
+        <form id="post-it-form" onsubmit="createPostItThroughForm(event)">
+            <div class="text-area-div">
+                <label for="content-area" class="form-label" id="text-area-label">
+                    Post-it content:
+                </label>
+                <textarea id="content-area" name="content-area" placeholder="Write content..." maxlength="1400"
+                          required></textarea>
+            </div>
+
+            <!-- file chooser -->
+            <div class="file-chooser-div">
+                <label class="form-label">
+                    Select Image:
+                </label>
+                <label for="file-chooser" class="form-label file-chooser-label">
+                    <img src="sidebar/choose-image.png" alt="Select Image">
+                </label>
+                <input id="file-chooser" type="file" accept="image/jpeg, image/png">
+            </div>
+
+            <!-- color picker -->
+            <div class="color-picker-div">
+                <label for="color-picker" class="form-label color-picker-label">
+                    Pick a color:
+                </label>
+                <input id="color-picker" name="color-picker" type="color">
+            </div>
+
+            <div class="buttons-div">
+                <button class="submit-button form-buttons">Submit</button>
+            </div>
+        </form>
+
+        <!--  POST-IT AREA -->
+        <div id="post-it-area">
+            <div id="post-it-exit-area">
+                <button class="post-it-exit-button" onclick="addExitButtonListener(event)">
+                    X
+                </button>
+            </div>
+
+            <div id="post-it-row-column-area">
+                <label for="row-area" style="display: inline-block">Row: </label>
+                <textarea id="row-area" class="post-it-area-textArea" style="margin-right: 5px"></textarea>
+
+                <label for="column-area" style="display: inline-block">Column: </label>
+                <textarea id="column-area" class="post-it-area-textArea" style="margin-right: 20px"></textarea>
+
+                <label for="color-area" style="display: inline-block">
+                    Color:
+                </label>
+                <input id="color-area" name="color-picker" type="color">
+            </div>
+
+
+            <div id="post-it-top-area"></div>
+
+            <div id="post-it-bottom-area">
+
+                <button class="post-it-area-buttons post-it-editTextArea-button"
+                        style="display: none; margin-right: 15px">
+                    <i class="material-icons-outlined">edit</i>
+                    Edit
+                </button>
+
+                <label for="editImage" class="post-it-area-buttons post-it-editImage-button"
+                       style="display: none; margin-right: 15px">
+                    <i class="material-icons-outlined">edit</i>
+                    Edit
+                </label>
+                <input id="editImage" type="file" accept="image/jpeg, image/png">
+
+                <button class="post-it-area-buttons post-it-undo-button"
+                        style="display: inline-block; margin-right: 15px">
+                    <i class="material-icons-outlined">history</i>
+                    Undo
+                </button>
+
+                <button class="post-it-area-buttons post-it-save-button" style="display: none">
+                    <i class="material-icons-outlined">save_as</i>
+                    Save
+                </button>
+
+                <button class="post-it-area-buttons post-it-cancel-button" style="display: none">
+                    <i class="material-icons-outlined">block</i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Very important element! Serves as a "shield" -->
+        <div id="overlay-form"></div>
+
+        <div id="overlay"></div>
+
+        <!-- Modal -->
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <h3>Confirmation</h3>
+                <p>Are you sure you want to archive this board? <br> This action cannot be undone.</p>
+                <div class="modal-buttons">
+                    <button id="confirmArchiveBtn" class="btn">Archive</button>
+                    <button id="cancelArchiveBtn" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SHARE BOARD SECTION -->
+        <div id="shareBoardModal" class="shareModal">
+            <div class="shareModal-content">
+                <span class="exitButton">&times;</span>
+                <h3>Share Board</h3>
+                <input type="text" name="search" id="searchInput" placeholder="Search...">
+                <input type="submit" value="Share" onclick="shareBoard()">
+                <div class="labels header-labels">
+                    <div>
+                        <span>Users</span>
+                    </div>
+                    <div>
+                        <span>Read</span>
+                        <span>Write</span>
+                    </div>
+                </div>
+                <ul id="userList">
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="../commons/commons.js"></script> <!-- Link to JavaScript file -->
+<script src="BoardCreator.js"></script> <!-- Link to JavaScript file -->
+<script src="board-page.js"></script> <!-- Link to JavaScript file -->
+<script src="post-it.js"></script> <!-- Link to JavaScript file -->
+</body>
+</html>

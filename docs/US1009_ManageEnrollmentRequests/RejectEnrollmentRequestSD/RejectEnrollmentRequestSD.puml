@@ -1,0 +1,42 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Reject Enrollment Request
+
+participant "ListEnrollmentRequestsUI" as LUI <<ui>>
+actor "Manager" as M
+participant "RejectEnrollmentRequestUI" as UI <<ui>>
+participant "RejectEnrollmentRequestController" as Controller <<application>>
+database "EnrollmentRequestRepository" as ERepo <<repository>>
+participant "EnrollmentRequest" as Er <<domain>>
+
+-> UI: onLoad
+
+activate UI
+
+UI --> M: request decision reason
+
+M --> UI: introduce decision reason and submit
+
+UI -> Controller: rejectEnrollmentRequest(selectedEnrollmentRequest, decisionReason)
+
+activate Controller
+
+Controller -> Er: rejectEnrollmentRequest()
+
+Controller -> ERepo: save(selectedEnrollmentRequest)
+
+Controller -> UI: return success
+
+UI --> M: display success
+
+deactivate Controller
+
+deactivate UI
+
+@enduml

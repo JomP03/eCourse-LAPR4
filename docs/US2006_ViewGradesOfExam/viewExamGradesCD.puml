@@ -1,0 +1,63 @@
+@startuml
+
+left to right direction
+
+package ui {
+
+    class ViewExamsGradesUI {}
+
+}
+
+package coursemanagement {
+    class TeacherCoursesProvider {
+        +listTeacherCourses(): Iterable<Course>
+    }
+}
+
+package exammanagement {
+    class CourseExamsProvider {
+        +listCourseExams(course): Iterable<Exams>
+    }
+}
+
+package takenexammanagment {
+
+    package application {
+
+        class ViewExamGradesController {
+            +listTeacherCourses(): Iterable<Course>
+            +listCourseExams(course): Iterable<Exams>
+            +listTakenExams(exam): Iterable<TakenExam>
+            -verifyUserIsTeacher() : ECourseUser
+        }
+
+        interface TakenExamProvider {
+            +provideTakenExams(exam): Iterable<TakenExam>
+        }
+
+    }
+
+    package repository {
+        interface TakenExamRepository {
+            +findByExam(exam): Iterable<TakenExam>
+        }
+    }
+}
+
+package ecourseusermanagement {
+
+    class UserSessionService {
+        +getLoggedUser(): ECourseUser
+    }
+}
+
+
+ViewExamsGradesUI --> ViewExamGradesController
+ViewExamGradesController --> UserSessionService
+ViewExamGradesController -> TeacherCoursesProvider
+ViewExamGradesController --> CourseExamsProvider
+ViewExamGradesController -u> TakenExamProvider
+TakenExamProvider -> TakenExamRepository
+
+
+@enduml

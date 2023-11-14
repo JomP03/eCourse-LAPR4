@@ -1,0 +1,69 @@
+@startuml
+
+title US2001 - List Student Future Exams Sequence Diagram
+
+autonumber
+skinparam shadowing false
+
+actor Student as S
+participant "ListFutureExamsUI" as UI <<UI>>
+participant "ListFutureExamsController" as LC <<Application>>
+participant "StudentCoursesProvider" as SS <<Service>>
+participant "CourseExamsProvider" as CS <<Service>>
+participant "ExamRepository" as ER <<Repository>>
+
+S --> UI : asks to view a list of future exams
+
+activate UI
+
+UI -> LC: create(userSessionService, studentCoursesProvider, courseExamsProvider)
+
+UI -> LC: futureExams()
+
+activate LC
+
+LC -> LC: studentActiveCourses(student)
+
+LC -> SS: provideUserActiveCourses(student)
+
+activate SS
+
+SS -> LC: courses
+
+deactivate SS
+
+loop for each course
+
+LC -> CS: provideFutureCourseExams(course)
+
+activate CS
+
+CS -> ER: findFutureAutomatedExamsByCourse(course)
+
+activate ER
+
+ER -> CS: automatedExams
+
+CS -> ER : findFormativeExamByCourse(course)
+
+ER -> CS: formativeExams
+
+deactivate ER
+
+note over CS: automatedExams + formativeExams
+
+CS -> LC: exams
+
+deactivate CS
+
+end loop
+
+LC -> UI: exams
+
+deactivate LC
+
+UI --> S: list of exams
+
+deactivate UI
+
+@enduml

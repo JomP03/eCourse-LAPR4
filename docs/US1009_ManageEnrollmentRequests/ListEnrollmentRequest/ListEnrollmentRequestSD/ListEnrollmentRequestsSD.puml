@@ -1,0 +1,105 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title List Enrollment Requests
+
+actor "Manager" as M
+participant "ManageEnrollmentRequestUI" as UI <<ui>>
+participant "ManageEnrollmentRequestController" as Controller <<application>>
+participant "ListCoursesByStateService" as ListCourses <<application>>
+database "CourseRepository" as CRepo <<repository>>
+database "EnrollmentRequestRepository" as ERepo <<repository>>
+participant "EnrollmentRequest" as Er <<domain>>
+participant "ApproveEnrollmentRequestUI" as AEUI <<ui>>
+participant "RejectEnrollmentRequestUI" as REUI <<ui>>
+
+M --> UI: list enrollment request
+
+activate UI
+
+UI -> Controller: create(enrollmentRequestRepository)
+
+UI -> Controller: getCoursesOpenForEnrollment()
+
+activate Controller
+
+Controller -> ListCourses: create(courseRepository)
+
+Controller -> ListCourses: findCoursesByState(ENROLL)
+
+note right of Controller: ENROLL is the only state valid for enrollment requests to be accepted
+
+activate ListCourses
+
+ListCourses -> CRepo: findCoursesByState(ENROLL)
+
+activate CRepo
+
+CRepo -> ListCourses: courses
+
+deactivate CRepo
+
+ListCourses -> Controller: courses
+
+deactivate ListCourses
+
+Controller -> UI: courses
+
+deactivate Controller
+
+UI --> M: display enroll state courses
+
+M --> UI: select course and submit
+
+UI -> Controller: getEnrollmentRequestsForCourse(selectedCourse)
+
+activate Controller
+
+Controller -> ERepo: findByCourseAndState(selectedCourse, PENDING)
+
+note right of Controller: PENDING is the only state that can be altered
+
+activate ERepo
+
+ERepo -> Controller: enrollmentRequests
+
+deactivate ERepo
+
+Controller -> UI: enrollmentRequests
+
+deactivate Controller
+
+loop while want's to approve/reject enrollment requests
+
+UI --> M: display enrollment requests
+
+M --> UI: select enrollment request and submit
+
+UI --> M: approve/reject enrollment request
+
+M --> UI: select option and submit
+
+alt option == approve
+
+UI -> AEUI: create() and display
+
+end
+
+alt option == reject
+
+UI -> REUI: create() and display
+
+end
+
+UI -> UI: remove enrollment request from list
+
+end loop
+
+deactivate UI
+
+@enduml

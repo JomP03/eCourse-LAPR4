@@ -1,0 +1,31 @@
+@startuml
+
+left to right direction
+title 1006 - Available Course Listing Use Cases
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+'**********Manager Use Case*************
+:Manager: as M
+
+Usecase MU01 as "List all courses"
+
+'**********Teacher Use Case*************
+
+:Teacher: as T
+
+Usecase TU01 as "List all available courses"
+
+'**********Student Use Case*************
+
+:Student: as S
+
+Usecase SU01 as "List all available courses"
+
+
+M -d- MU01
+T -d- TU01
+S -d- SU01
+
+@enduml

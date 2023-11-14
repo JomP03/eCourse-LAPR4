@@ -1,0 +1,91 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+autonumber
+actor Teacher as T
+participant "ClassScheduleUI" as UI <<presentation>>
+participant "RecurrentClassScheduleController" as SC <<application>>
+participant "ListTeacherCoursesController" as LC <<application>>
+database "CourseRepository" as CR <<repository>>
+participant "ListAvailableClassSlotsController" as LAC <<application>>
+participant "UserSessionService" as USS <<application>>
+database "UserRepository" as URepo <<repository>>
+participant "ClassScheduler" as CSS <<service>>
+participant "RecurrentClassBuilder" as CB <<builder>>
+participant "RecurrentClass" as CL <<domain>>
+database "ClassRepository" as CLR <<repository>>
+
+
+
+activate T
+T -> UI : Asks to schedule a class
+activate UI
+UI -> SC : getTeacherActiveCourseList()
+activate SC
+SC -> LC : getTeacherActiveCourseList()
+activate LC
+LC--> CR : findAvailableTeacherCourses()
+activate CR
+CR --> LC : returns courseList
+deactivate CR
+LC --> SC : returns courseList
+deactivate LC
+SC --> UI : courseList
+deactivate SC
+UI -> UI : display courseList
+T -> UI : provides the course\n to schedule the class
+UI -> SC : getAvailableRecurrentClassSlots(courseList, chosenCourse)
+activate SC
+SC -> LAC : getAvailableRecurrentClassSlots(courseList, chosenCourse)
+activate LAC
+LAC -> USS: findECourseUserByUsername()
+activate USS
+USS -> URepo: ofIdentity(username)
+activate URepo
+URepo -> USS: eCourseUser
+deactivate URepo
+USS -> LAC: eCourseUser
+deactivate USS
+LAC -> CSS : getAvailableCourseTeacherIntersectionRecurrentSlots(courses,\n user, chosenCourse)
+activate CSS
+CSS--> CLR : findCourseRecurrentClasses(course)
+activate CLR
+CLR --> CSS : returns courseClasses
+deactivate CLR
+CSS -> CSS : calculates availableClassSlots
+deactivate CLR
+CSS -> LAC : returns availableClassSlots
+deactivate CSS
+LAC --> SC : returns availableClassSlots
+deactivate LAC
+SC --> UI : availableClassSlots
+deactivate SC
+UI -> UI : display availableClassSlots
+T -> UI : provides the class slot
+UI -> T : requests the class data
+T -> UI : provides the class data
+UI -> SC : scheduleClass(title, course,\n weekDay, time, duration, course,courses)
+activate SC
+SC -> CSS : scheduleRecurrentClass(title, course,\n weekDay, time, duration,teacher,courses)
+activate CSS
+CSS -> CB : build()
+activate CB
+CB -> CL : create()
+CB -> CSS : returns class
+deactivate CB
+CSS -> CSS : validates the class
+CSS -> CLR : save(class)
+CSS -> SC : returns sucess
+deactivate CSS
+SC -> UI : shows success
+deactivate SC
+UI -> T : shows success
+
+
+deactivate UI
+
+@enduml

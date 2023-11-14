@@ -1,0 +1,62 @@
+@startuml
+
+left to right direction
+
+
+package ui {
+        class CreateCourseUI {
+        }
+    }
+
+package coursemanagement {
+
+
+    package application {
+        class CreateCourseController {
+            +createCourse()
+        }
+    }
+
+    package repository {
+        interface CourseRepository {
+            +ofIdentity(): Course
+        }
+    }
+
+    package domain {
+        class Course {}
+
+        class CourseCode {}
+
+        class CourseName {}
+
+        class CourseDescription {}
+
+        enum CourseState {}
+
+        class CourseBuilder {
+            +withCourseCode(): CourseBuilder
+            +withCourseName(): CourseBuilder
+            +withCourseDescription(): CourseBuilder
+            +withMinNrEnrolledStudents(): CourseBuilder
+            +withMaxNrEnrolledStudents(): CourseBuilder
+            +build(): Course
+        }
+    }
+
+
+}
+
+Course --> CourseCode
+Course --> CourseDescription
+Course --> CourseName
+Course --> CourseState
+CourseBuilder --> Course
+CourseBuilder --> CourseRepository
+
+CreateCourseUI --> CreateCourseController
+CreateCourseController --> CourseRepository
+CreateCourseController --> CourseBuilder
+CourseRepository -> Course
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+
+title US3004 - Share a Board
+
+skinparam shadowing false
+
+left to right direction
+
+package HTTP {
+
+    class ShareBoardEndpointProcessor {
+      + processRequest(request, response) : void
+      + redirectAccordingToMethod() : void
+      + getAvailableUsersToShareBoardWith() : void
+      + shareBoard() : void
+    }
+}
+
+package boardmanagement {
+package Domain{
+    class Board{
+        users() : List<BoardPermission>
+    }
+}
+
+package Application {
+    class ShareBoardController {
+        + ShareBoardController(userRepository, boardPermissionHandler, boardRepository)
+        + availableUsersToShareBoardWith(board, user) : List<ECourseUser>
+        + shareBoard(board, userId, read, write) : void
+    }
+
+    class BoardPermissionHandler {
+        + BoardPermissionHandler(usersProvider)
+        + handleBoardSharing(board, userId, read, write) : void
+    }
+}
+
+package repository{
+    class BoardRepository{
+        + findAvailableUsersToShareBoardWith(board) : Iterable<ECourseUser>
+        + save(board) : void
+    }
+}
+}
+
+package ecourseusermanagement{
+    interface IUsersProvider {
+        + retrieveUserById(id) : Optional<ECourseUser>
+    }
+}
+
+ShareBoardEndpointProcessor ..> ShareBoardController
+BoardPermissionHandler --> Board
+ShareBoardController --> BoardRepository
+ShareBoardController --> BoardPermissionHandler
+BoardPermissionHandler --> IUsersProvider
+
+
+
+@enduml

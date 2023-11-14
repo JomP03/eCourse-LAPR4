@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Boards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="my-boards-page.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/base-gradient.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/header.css">  <!-- Link to CSS file -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
+    <!-- Link to Google Fonts -->
+</head>
+<body onload="loadMyBoardsPage()">
+<div class="super-container">
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <!--  HEADER-->
+    <div class="header-container">
+        <div class="header-info">
+            <h2 class="header-text-field">eCourse</h2>
+            <h2 class="header-text-field" id="username"></h2>
+        </div>
+        <div class="header-separator"></div>
+    </div>
+
+    <ul class="notification-container"></ul>
+    <!--  MAIN -->
+    <div class="main-container">
+        <h1 class="boardsLabel">My Boards</h1>
+        <div class="boards-container" id="boards-container">
+        </div>
+        <div id="confirmationModal" class="modal" style="display: none">
+            <div class="confirmation-modal-content">
+                    <h3>Confirmation</h3>
+                    <p>Are you sure you want to cancel the creation? <br> All changes will be lost.</p>
+                    <div class="modal-buttons">
+                        <button id="cancelCreationBtn" class="btn">Yes</button>
+                        <button id="continueCreationBtn" class="btn">No</button>
+                    </div>
+            </div>
+        </div>
+
+        <script src="../commons/commons.js"></script> <!-- Link to JavaScript file -->
+        <script src="my-boards-page.js"></script> <!-- Link to JavaScript file -->
+</body>
+</html>

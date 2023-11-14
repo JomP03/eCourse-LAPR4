@@ -1,0 +1,68 @@
+@startuml
+
+title US2001 - List Student Future Exams Class Diagram
+
+skinparam shadowing false
+left to right direction
+
+package UI {
+
+    class ListFutureExamsUI {}
+
+}
+
+package exammanagement {
+
+    package Application {
+
+        class ListFutureExamsController {
+
+            - verifyStudent(): void
+            + ListFutureExamsController(userSessionService, studentCoursesProvider, courseExamsProvider)
+            - studentActiveCourses(student): Iterable<Course>
+            + futureExams(): List<Exam>
+
+        }
+
+        interface ICourseExamsProvider {
+
+            + provideFutureCourseExams(course): List<Exam>
+
+        }
+
+    }
+
+    package domain {
+
+        class Exam {}
+
+    }
+
+    package repository {
+
+        interface IExamRepository {
+            + findFutureAutomatedExamsByCourse(course): Iterable<Exam>
+            + findFormativeExamByCourse(course): Iterable<Exam>
+        }
+
+    }
+
+}
+
+package coursemanagement {
+    package application {
+        interface IUserCoursesProvider {
+            + provideUserActiveCourses(user): Iterable<Course>
+        }
+
+    }
+
+}
+
+ListFutureExamsUI ..> ListFutureExamsController
+ListFutureExamsController --> ICourseExamsProvider
+ListFutureExamsController ..> IUserCoursesProvider
+ICourseExamsProvider --> IExamRepository
+IExamRepository ---> Exam
+
+@enduml

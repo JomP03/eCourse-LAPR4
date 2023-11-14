@@ -1,0 +1,53 @@
+@startuml
+
+title Add Question
+
+autonumber
+actor Teacher as T
+participant "AddQuestionUI" as UI <<ui>>
+participant "AddTypeQuestionUI" as TQUI <<ui>>
+participant "AddTypeQuestionController" as CTRL <<application>>
+participant "QuestionFactory" as QF <<domain>>
+participant "IQuestionFileGenerator" as fileGenerator <<application>>
+participant "IQuestionValidator" as VAL <<domain>>
+database "QuestionRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+
+activate UI
+UI --> T : displays the question types\n
+T -> UI : selects a question type
+UI -> TQUI : creates and displays
+deactivate UI
+activate TQUI
+TQUI -> CTRL : create(questionRepo, questionFactory)
+TQUI --> T : asks for the question data
+T -> TQUI : fills the question form
+TQUI -> CTRL : addQuestion(questionData)
+activate CTRL
+CTRL -> QF : create(questionValidator)
+CTRL -> QF : createTypeQuestion(questionData)
+activate QF
+QF -> fileGenerator : generateQuestionType(question)
+activate fileGenerator
+fileGenerator -> QF : returns the generated file
+deactivate fileGenerator
+QF -> VAL : validate(filePath)
+activate VAL
+VAL -> QF : returns the question
+deactivate VAL
+deactivate VAL
+QF --> CTRL : returns the question
+deactivate QF
+CTRL -> REPO : save(question)
+activate REPO
+REPO -> CTRL : returns the save result
+deactivate REPO
+CTRL --> TQUI : returns the save result
+deactivate CTRL
+TQUI --> T : displays a success message
+deactivate TQUI
+
+
+@enduml

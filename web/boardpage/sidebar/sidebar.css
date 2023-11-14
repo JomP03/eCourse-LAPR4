@@ -1,0 +1,86 @@
+/* SIDEBAR */
+.sidebar {
+    width: 200px; /* Initial width of the sidebar */
+    height: 100%;
+    background-color: #d5d8dc;
+    float: left;
+    transition: width 0.5s ease; /* Add smooth transition effect */
+    z-index: 1;
+    position: relative;
+}
+
+
+.sidebar-lateral-separator {
+    width: 0.2em;
+    height: 100%;
+    background-color: #d5d8dc;
+    float: right;
+    box-shadow: 3px 0px 4px rgba(0, 0, 0, 0.3); /* Add box shadow on the right side */
+}
+
+.sidebar-header {
+    padding-top: 7px;
+    padding-bottom: 50px;
+    padding-right: 16px;
+}
+
+.sidebar-toggle {
+    transform: rotate(-180deg) scale(1.4);
+    cursor: pointer;
+    width: 40px;
+    height: 30px;
+    float: right;
+    transition: ease-in-out 0.2s;
+}
+
+.sidebar-toggle:hover {
+    transform: scale(1.6) rotate(-180deg);
+}
+
+/* COLLAPSED STATE */
+.sidebar-collapsed {
+    width: 50px; /* Adjust the width of the collapsed sidebar */
+}
+
+.sidebar-collapsed #sidebar-icon {
+    transform: rotate(-180deg); /* Adjust the rotation angle of the icon */
+}
+
+.sidebar-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 10px 10px 13px;
+    border-bottom: 2px solid #c0c3c6; /* Add a separator line */
+    transition: ease-in 0.2s;
+    cursor: pointer;
+}
+
+.sidebar-button:hover {
+    background-color: #c0c3c6; /* Add a dark-grey background on hover */
+}
+
+.sidebar-button:active {
+    transform: translateX(3px);
+}
+
+.button-icon {
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.button-text {
+    color: #112339;
+    padding-top: 2px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    display: inline-block;
+
+}
+
+/* Hide the text when sidebar is collapsed */
+.sidebar-collapsed .button-text {
+    display: none;
+}
+
+
+

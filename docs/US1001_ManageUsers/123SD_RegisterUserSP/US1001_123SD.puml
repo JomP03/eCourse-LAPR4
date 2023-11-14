@@ -1,0 +1,34 @@
+@startuml
+
+title Register User Sequence Diagram - Starting point
+
+autonumber
+actor Manager as M
+participant "RegisterUserUI" as RUI <<ui>>
+participant "RegisterUserController" as RUC <<application>>
+participant "ECourseRoles" as ECR <<domain>>
+participant "RegisterTypeUserUI" as RTUI <<ui>>
+
+-> RUI : onLoad
+activate RUI
+RUI -> RUC : create
+RUI -> RUC : existingRoles()
+activate RUC
+RUC -> ECR : existingRoles()
+activate ECR
+ECR --> RUC : roles
+deactivate ECR
+RUC --> RUI : roles
+deactivate RUC
+RUI -> M : displays\n available roles
+M --> RUI : chooses role
+RUI -> RUI: displayRoleUI()
+activate RUI
+RUI -> RTUI : create and display
+activate RTUI
+deactivate RUI
+deactivate RUI
+
+
+
+@enduml

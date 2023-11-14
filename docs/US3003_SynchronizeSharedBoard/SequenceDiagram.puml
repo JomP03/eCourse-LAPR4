@@ -1,0 +1,78 @@
+@startuml
+
+title Simulate User Accessing Board
+
+autonumber
+actor User as U
+participant "System" as Sys <<System>>
+
+activate Sys
+
+U -> Sys: access board
+
+Sys -> Sys: prepare available options
+
+note right of Sys: options are: \n - Edit a post-it \n - View a post-it \n - Clear board content \n - Exit
+
+loop until user exits
+
+Sys -> U: display options
+
+U -> Sys: select option
+
+alt edit post-it
+
+    Sys -> U: request post-it coordinates
+
+    U -> Sys: provide post-it coordinates
+
+    Sys -> Sys: sem_wait(&semaphore_post_it_coordinates)
+
+    note right of Sys: sem_wait() blocks until post-it at \n coordinates are available
+
+    Sys -> U: request new post-it content
+
+    U -> Sys: provide new post-it content
+
+    Sys -> Sys: edit_postit(coordinates, content)
+
+    Sys -> Sys: sem_post(&semaphore_post_it_content)
+
+    note right of Sys: sem_post() unblocks the access to \n post-it content at coordinates
+
+else view post-it
+
+    Sys -> U: request post-it coordinates
+
+    U -> Sys: provide post-it coordinates
+
+    Sys -> Sys: view_postit(coordinates)
+
+    Sys -> U: display post-it content
+
+else clear board content
+
+    Sys -> U: request password
+
+    U -> Sys: provide password
+
+    Sys -> Sys: check_password(password)
+
+    Sys -> Sys: unlink semaphores and shared memory
+
+    Sys -> Sys: exit()
+
+else exit
+
+    Sys -> Sys: exit()
+
+
+
+end
+
+end
+
+
+
+
+@enduml

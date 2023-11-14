@@ -1,0 +1,158 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+actor Teacher as T
+participant "UpdateFormativeExamUI" as UI <<UI>>
+participant "UpdateFormativeExamController" as Controller <<Application>>
+participant "UserSessionService" as US <<Application>>
+database "ExamRepository" as Erepo <<Repository>>
+participant "FormativeExam" as E <<Domain>>
+participant "QuestionProvider" as QProvider <<Application>>
+
+activate UI
+T --> UI : asks to update a formative exam
+UI -> Controller : create(userSessionService, examRepo, questionProvider)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : returns logged user
+deactivate US
+deactivate Controller
+
+UI -> Controller: listCreatorFormativeExams()
+activate Controller
+Controller -> Erepo : findFormativeExamsByCreator(user)
+activate Erepo
+Erepo -> Controller : returns formative exams
+deactivate Erepo
+Controller -> UI : returns formative exams
+deactivate Controller
+UI --> T: shows formative exams
+T --> UI: selects a formative exam
+UI -> Controller: defineFormativeExam(formativeExam)
+UI --> T: asks if user wants to view the exam
+
+alt user wants to view the exam
+
+    UI --> T: shows exam
+
+end
+
+UI --> T: display possible update actions
+T --> UI: selects update action
+
+alt user wants to update the title
+
+    UI --> T: requests new title
+    T --> UI: enters new title
+    UI -> Controller: updateTitle(newTitle)
+    activate Controller
+    Controller -> Erepo: IsTitleAlreadyAssigned(newTitle)
+    activate Erepo
+    Erepo -> Controller: returns false
+    deactivate Erepo
+    Controller -> E: updateTitle(newTitle)
+    Controller -> Erepo : save(exam)
+    activate Erepo
+    Erepo -> Controller : returns updated exam
+    deactivate Erepo
+    Controller -> UI: return success
+    deactivate Controller
+    UI --> T: shows success
+
+else user wants to update the header
+
+    UI --> T: requests new header, grading feedback and feedback type
+    T --> UI: enters new header, grading feedback and feedback type
+    UI -> Controller: updateHeader(newHeader, newGradingFeedback, newFeedbackType)
+    activate Controller
+    Controller -> E: updateHeader(newHeader)
+    Controller -> Erepo : save(exam)
+    activate Erepo
+    Erepo -> Controller : returns updated exam
+    deactivate Erepo
+    Controller -> UI: return success
+    deactivate Controller
+    UI --> T: shows success
+
+else user wants to update the section
+
+    UI --> T: display available sections
+    note right of T
+        it would show the section description
+    end note
+    T --> UI: selects section
+    UI --> T: display the options
+    note right of T
+        it would allow the user to select to change either the section description, individual questions or all questions
+    end note
+
+    alt user wants to update the section description
+
+        UI --> T: requests new section description
+        T --> UI: enters new section description
+        UI -> Controller: updateSectionDescription(section, newSectionDescription)
+        activate Controller
+        Controller -> E: updateSectionDescription(section, newSectionDescription)
+        Controller -> Erepo : save(exam)
+        activate Erepo
+        Erepo -> Controller : returns updated exam
+        deactivate Erepo
+        Controller -> UI: return success
+        deactivate Controller
+        UI --> T: shows success
+
+    else user wants to update individual questions
+
+        UI --> T: display available questions
+        note right of T
+            it would show the questions relative to the selected section
+        end note
+        T --> UI: selects question
+        UI -> Controller: updateQuestion(section, questionIndex)
+        activate Controller
+        Controller -> QProvider : updateSingleQuestion(questionType, listQuestions, index)
+        note right of Controller
+            index represents the position of the question in the list of questions
+        end note
+        activate QProvider
+        QProvider -> Controller : updated listQuestions
+        deactivate QProvider
+        Controller -> E: updateSectionQuestions(section, listQuestions)
+        Controller -> Erepo: save(formativeExam)
+        activate Erepo
+        Erepo -> Controller : returns updated exam
+        deactivate Erepo
+        Controller -> UI: return success
+        deactivate Controller
+        UI --> T: shows success
+
+    else user wants to update all questions from a section
+
+        UI -> Controller: updateQuestions(section)
+        activate Controller
+        Controller -> QProvider : updateAllSectionQuestions(questionType, listQuestions)
+        activate QProvider
+
+        QProvider -> Controller : updated listQuestion
+        deactivate QProvider
+        Controller -> E: updateSectionQuestions(section, listQuestions)
+        Controller -> Erepo: save(formativeExam)
+        activate Erepo
+        Erepo -> Controller : returns updated exam
+        deactivate Erepo
+        Controller -> UI: return success
+        deactivate Controller
+        UI --> T: shows success
+
+    end
+
+end
+
+deactivate UI
+
+@enduml

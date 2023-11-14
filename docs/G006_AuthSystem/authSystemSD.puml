@@ -1,0 +1,44 @@
+@startuml
+
+title Authentication System Sequence Diagram - Any App
+
+autonumber
+actor User as U
+participant ":LoginUI" as UI
+participant ":CredentialHandler" as CH
+participant ":Authenticator" as AUTH
+participant ":UserRepository" as UR
+participant ":AuthorizationService" as ASV
+participant ":UserSession" as US
+
+activate U
+U -> UI : Asks to login
+activate UI
+UI -> U: requests username\n and password
+U -> UI : types username\n and password
+
+UI -> CH: authenticated(username,\n password, appRole)
+activate CH
+CH -> AUTH: authenticate(username,\n password, appRole)
+activate AUTH
+AUTH -> UR: ofIdentity(username)
+activate UR
+UR --> AUTH: returns user
+deactivate UR
+AUTH --> AUTH: check user's credentials
+activate AUTH
+deactivate AUTH
+AUTH --> ASV: createSessionForUser(user)
+activate ASV
+ASV --> US **: create(user)
+
+ASV --> AUTH: returns session
+deactivate ASV
+AUTH --> CH: returns session
+deactivate AUTH
+CH --> UI: returns success
+deactivate CH
+UI --> U: redirects to app menu
+deactivate UI
+
+@enduml

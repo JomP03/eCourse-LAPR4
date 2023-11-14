@@ -1,0 +1,26 @@
+@startuml
+
+title Add or Update Question - Starting point
+
+autonumber
+actor Teacher as T
+participant "AddOrUpdateQuestionUI" as UI <<ui>>
+participant "AddQuestionUI" as AQ <<ui>>
+participant "UpdateQuestionUI" as UQ <<ui>>
+
+
+-> UI : onLoad
+
+activate UI
+UI --> T : asks if the teacher\nwants to add or \nupdate a question
+T -> UI : chooses one
+alt chooses add option
+UI -> AQ : create and display
+else chooses update option
+UI -> UQ : create and display
+end
+deactivate UI
+
+
+
+@enduml

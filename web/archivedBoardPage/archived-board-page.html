@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archived</title>
+    <link rel="stylesheet" href="archived-board-page.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/base-gradient.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/header.css">  <!-- Link to CSS file -->
+</head>
+<body onload="loadArchivePage()">
+<!--  HEADER-->
+<div class="header-container">
+    <div class="header-info">
+        <h2 class="header-text-field">eCourse</h2>
+        <h2 class="header-text-field" id="username"></h2>
+    </div>
+    <div class="header-separator"></div>
+</div>
+<!--  END HEADER-->
+
+<!--Heading 1 -->
+<h1 class="info-archived">Your board has been archived!</h1>
+
+<script src="../commons/commons.js"></script> <!-- Link to JavaScript file -->
+<script src="archived-board-page.js"></script> <!-- Link to JavaScript file -->
+<script>
+    setUserName();
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+@startuml
+
+title Create a Board - Sequence Diagram
+
+autonumber
+actor User as U
+participant "CreateBoardUI" as UI <<UI>>
+participant "CreateBoardController" as Controller <<Application>>
+participant "UserSessionService" as US <<Service>>
+participant "BoardBuilder" as BB <<Domain>>
+database "BoardRepository" as BR <<Repository>>
+participant "Board" as B <<Domain>>
+
+
+
+activate UI
+U --> UI : asks to create a board
+UI --> Controller : create(userSessionService)
+UI --> U : Asks for board necessary data
+U --> UI : enters data (boardTitle, numOfRows, numOfColumns)
+
+loop while rows aren't completely filled
+UI --> U : Asks for rows data
+U --> UI : enters data (rowTitle)
+UI --> UI : add to rows list
+end loop
+
+loop while columns aren't completely filled
+UI --> U : Asks for columns data
+U --> UI : enters data (columnTitle)
+UI --> UI : add to column list
+end loop
+
+
+
+UI -> Controller: createBoard(boardOwner, boardTitle, rowsList, columnsList)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : eCourseUser
+deactivate US
+
+
+Controller -> BB: withBoardOwner(eCourseUser)
+activate BB
+Controller -> BB: withBoardTitle(title)
+Controller -> BB: withRowsList(rowsList)
+Controller -> BB: withColumnsList(columnsList)
+Controller -> BB: build()
+
+BB -> BR: findByTitle(boardTitle)
+activate BR
+BR -> BB: returns board
+deactivate BR
+BB -> B: create
+BB -> Controller: returns board
+deactivate BB
+
+Controller -> BR: save(board)
+activate BR
+BR -> Controller: returns success
+deactivate BR
+Controller -> UI: returns success
+deactivate Controller
+UI --> U: shows success
+
+@enduml

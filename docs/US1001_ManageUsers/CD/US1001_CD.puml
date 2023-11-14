@@ -1,0 +1,243 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+'title
+title US1001 - ECourseUser Management Class Diagram
+
+package ui {
+class ManagerMenuUI {
+}
+
+class RegisterUserUI {
+}
+
+class EnableUserUI {
+}
+
+class DisableUserUI {
+}
+
+class ListUsersUI {
+}
+
+class RegisterManagerUI {
+}
+
+class RegisterTeacherUI {
+}
+
+class RegisterStudentUI {
+}
+}
+
+ManagerMenuUI -d-> RegisterUserUI
+ManagerMenuUI -u---> EnableUserUI
+ManagerMenuUI -u--> DisableUserUI
+ManagerMenuUI -u-> ListUsersUI
+DisableUserUI ..> ListUsersUI
+EnableUserUI ..> ListUsersUI
+
+'registers
+
+RegisterUserUI --> RegisterStudentUI
+RegisterUserUI ---> RegisterTeacherUI
+RegisterUserUI ----> RegisterManagerUI
+
+
+package ecourseusermanagement {
+package repositories {
+interface IeCourseUserRepository {
++ findAllEnabledUsers(): Iterable<ECourseUser>
++ findAllDisabledUsers(): Iterable<ECourseUser>
++ findAllUsers(): Iterable<ECourseUser>
++ findLastMechanographicNumberInYear(year): Optional<UserMechanographicNumber>
+}
+note bottom of IeCourseUserRepository
+  In order to reduce the complexity of the diagram,
+  there are not represented the connections between
+  the controllers and this class.
+  ---
+  This interface extends the DomainRepository
+  interface, which is not shown in this diagram,
+  as it is part of the EAPLIFRAMEWORK, and it is
+  not relevant to represent it.
+end note
+}
+
+package domain {
+class ECourseUser {
+}
+note right of ECourseUser
+  In order to reduce the complexity of the diagram,
+  there are not represented the connections between
+  the controllers and this class.
+end note
+enum UserState {
+ENABLED
+DISABLED
+}
+class UserBirthdate {
+- birthdate: LocalDate
+}
+class UserMechanographicNumber {
+- mechanographicNumber: String
+}
+class UserAcronym {
+- acronym: String
+}
+class UserTaxNumber {
+- taxNumber: String
+}
+
+UserState -u-* ECourseUser
+UserBirthdate -u-* ECourseUser
+UserMechanographicNumber -u-* ECourseUser
+UserAcronym -u-* ECourseUser
+UserTaxNumber -u-* ECourseUser
+
+package ecourseuserbuilders {
+
+interface IeCourseUserBuilderFactory {
++ createECourseUserBuilder(role): IeCourseUserBuilder
+}
+
+interface IeCourseUserBuilder {
++ withSystemUser(systemUser): IeCourseUserBuilder
++ build(): ECourseUser
+}
+
+class StudentBuilder {
++ StudentBuilder(mechanographicNumberAssigner):
++ withBirthdate(birthdate): StudentBuilder
++ withTaxPayerNumber(taxNumber): StudentBuilder
+}
+
+class TeacherBuilder {
++ withAcronym(acronym): TeacherBuilder
++ withBirthdate(birthdate): TeacherBuilder
++ withTaxPayerNumber(taxNumber): TeacherBuilder
+}
+
+class ManagerBuilder {
+}
+
+StudentBuilder --|> IeCourseUserBuilder
+TeacherBuilder --|> IeCourseUserBuilder
+ManagerBuilder --|> IeCourseUserBuilder
+
+IeCourseUserBuilderFactory ..> IeCourseUserBuilder
+}
+IeCourseUserBuilder --> ECourseUser
+
+interface IMechanographicNumberAssigner {
++ MechanographicNumberAssigner(eCourseUserRepository):
++ newMechanographicNumber(): UserMechanographicNumber
+}
+
+StudentBuilder ..> IMechanographicNumberAssigner
+}
+
+
+
+package application {
+class RegisterUserController {
++ RegisterUserController():
++ existingRoles(): Iterable<Role>
+}
+
+class EnableUserController {
++ EnableUserController(eCourseUserRepository):
++ disabledUsers(): Iterable<ECourseUser>
++ enableUser(user): Optional<ECourseUser>
+}
+
+class DisableUserController {
++ DisableUserController(eCourseUserRepository):
++ enabledUsers(): Iterable<ECourseUser>
++ disableUser(user): Optional<ECourseUser>
+}
+
+class ListUsersController {
++ ListUsersController(eCourseUserRepository):
++ allUsers(): Iterable<ECourseUser>
++ enabledUsers(): Iterable<ECourseUser>
++ disabledUsers(): Iterable<ECourseUser>
+}
+
+class RegisterStudentController {
++ RegisterStudentController(eCourseUserRepository, userBuilderFactory):
++ registerStudent(username, pwd, firstName, lastName,
+ email, birthdate, taxNumber): ECourseUser
+}
+
+class RegisterTeacherController {
++ RegisterTeacherController(eCourseUserRepository, userBuilderFactory):
++ registerTeacher(username, pwd, firstName, lastName,
+ email, acronym, birthdate, taxNumber): ECourseUser
+}
+
+class RegisterManagerController {
++ RegisterManagerController(eCourseUserRepository, userBuilderFactory):
++ registerManager(username, pwd, firstName, lastName,
+ email): ECourseUser
+}
+}
+' REGISTER CONTROLLERS
+RegisterUserController --> RegisterStudentController
+RegisterUserController ---> RegisterTeacherController
+RegisterUserController ----> RegisterManagerController
+
+' REGISTER UI - CONTROLLER
+RegisterUserUI ..> RegisterUserController
+RegisterStudentUI ..> RegisterStudentController
+RegisterTeacherUI ..> RegisterTeacherController
+RegisterManagerUI ..> RegisterManagerController
+
+' OTHERS UI - CONTROLLER
+EnableUserUI ..> EnableUserController
+DisableUserUI ..> DisableUserController
+ListUsersUI ..> ListUsersController
+
+' CONTROLLERS - BUILDER
+RegisterStudentController ..> IeCourseUserBuilderFactory
+RegisterTeacherController ..> IeCourseUserBuilderFactory
+RegisterManagerController ..> IeCourseUserBuilderFactory
+
+' ENTITY - REPOSITORY
+ECourseUser "*" -d-- "1" IeCourseUserRepository
+
+
+}
+
+
+package EAPLIFRAMEWORK {
+class SystemUser {
+- username: String
+- password: String
+- name: String
+- Email: String
+- active: boolean
+}
+note bottom of SystemUser
+  The properties of the user are simplified.
+  In reality there is actually a Value Object
+  for all the properties, except the "active".
+  Other not relevant properties are not being shown.
+end note
+}
+
+package usermanagement {
+class ECourseRoles {
++ getRoles(): Iterable<ECourseRoles>
++ {static} STUDENT: Role
++ {static} TEACHER: Role
++ {static} MANAGER: Role
++ {static} SUPERUSER: Role
+}
+}
+
+
+SystemUser .> ECourseRoles
+ECourseUser .....> SystemUser
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+autonumber
+actor Teacher as T
+participant "UpdateClassUI" as UI <<presentation>>
+participant "UpdateClassController" as SC <<application>>
+participant "ListAvailableSlotsForUpdateController" as LAC <<application>>
+participant "ListTeacherClassesController" as LTC <<application>>
+participant "ListTeacherCoursesController" as LC <<application>>
+database "CourseRepository" as CR <<repository>>
+participant "ClassScheduler" as CSS <<service>>
+participant "RecurrentClass" as CL <<domain>>
+database "ClassRepository" as CLR <<repository>>
+
+
+activate T
+
+T -> UI : asks to update a class
+activate UI
+UI -> SC : getTeacherClasses()
+activate SC
+SC -> LTC : getTeacherClasses()
+activate LTC
+LTC -> CR : findTeacherRecurrentClasses(teacher)
+activate CR
+CR -> LTC : recurrentClasses
+deactivate CR
+LTC -> SC : recurrentClasses
+deactivate LTC
+SC -> UI : recurrentClasses
+deactivate SC
+UI -> UI : shows Teacher Classes
+
+T -> UI : chooses a class
+UI -> SC : getAvailableUpdateSlots(chosenClass)
+activate SC
+SC -> LAC : getAvailableUpdateSlots(chosenClass)
+activate LAC
+LAC -> LC : getAvailableTeacherCourses()
+activate LC
+LC -> CR : findTeacherCourses(teacher)
+activate CR
+CR -> LC : teacherCourses
+deactivate CR
+LC -> LAC : teacherCourses
+deactivate LC
+LAC -> CSS : getAvailableUpdateSlots(chosenClass, \nteacherCourses, teacher)
+activate CSS
+CSS -> CLR : findCourseRecurrentClasses(course)
+activate CLR
+CLR --> CSS : returns courseRecurrentClasses
+CSS -> CLR : findCourseExtraClasses(course)
+CLR --> CSS : returns courseExtraClasses
+CSS -> CLR : findTeacherExtraClasses(course)
+CLR --> CSS : returns availableSlots
+deactivate CLR
+CSS -> LAC : availableSlots
+deactivate CSS
+LAC -> SC : availableSlots
+deactivate LAC
+SC -> UI : availableSlots
+deactivate SC
+UI -> UI : shows availableSlots
+
+
+
+T -> UI : chooses a slot
+UI -> SC : updateClass(chosenClass, chosenDate, teacherCourses)
+activate SC
+SC -> CSS : updateClass(chosenClass, chosenDate,\n teacherCourses, teacher)
+activate CSS
+CSS -> CSS : validates the new data
+CSS -> CL : updateOccurrence(chosenDate)
+CSS -> CLR : save(class)
+CSS -> SC : returns success
+deactivate CSS
+SC -> UI : returns success
+deactivate SC
+UI -> UI : shows success message
+
+
+
+deactivate T
+
+@enduml

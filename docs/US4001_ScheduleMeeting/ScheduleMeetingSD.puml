@@ -1,0 +1,120 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Schedule Meeting
+
+actor "eCourseUser" as eCourseUser
+participant "ScheduleMeetingUI" as ui <<ui>>
+participant "ScheduleMeetingController" as controller <<application>>
+participant "ListUsersController" as listUsersController <<application>>
+participant "MeetingScheduler" as scheduler <<application>>
+participant "Meeting" as meeting <<domain>>
+database "MeetingRepository" as meetingRepo <<repository>>
+participant "MeetingInvitationSender" as invitationSender <<application>>
+participant "MeetingInvitation" as meetingInvitation <<domain>>
+database "MeetingInvitationRepository" as meetingInvitationRepo <<repository>>
+
+-> ui: onLoad
+
+activate ui
+
+ui --> eCourseUser: request date
+
+eCourseUser --> ui: introduces date
+
+ui --> eCourseUser: request duration
+
+eCourseUser --> ui: introduces duration
+
+ui -> controller: create(userSessionService, listUsersController, meetingScheduler)
+
+ui -> controller: listInvitableUsers()
+
+activate controller
+
+controller -> listUsersController: enabledUsers()
+
+activate listUsersController
+
+listUsersController -> controller: users
+
+deactivate listUsersController
+
+controller -> ui: users
+
+deactivate controller
+
+ui --> eCourseUser: lists users
+
+loop while user wants to add participants
+
+    ui --> eCourseUser: request to select participant
+
+    eCourseUser --> ui: selects participant
+
+    ui -> ui: remove participant from selection list
+
+    note right of ui: list of participants to choose from (removing the selected user)
+
+    ui -> ui: add to participant to invite list
+
+    note right of ui: list of participants to invite (is formed during this selection process)
+
+end
+
+ui -> controller: scheduleMeeting(date, duration, usersToInvite)
+
+activate controller
+
+controller -> scheduler: scheduleMeeting(meetingOwner, date, duration, usersToInvite)
+
+note right of controller: meetingOwner is obtained from "UserSessionService" (logged user)
+
+activate scheduler
+
+loop for each user to invite
+
+    scheduler -> scheduler: check if user is available
+
+        note right of scheduler: remove user from list of users to invite if not available
+
+        note right of scheduler: In a different sequence diagram will be shown the process of checking if a user is available for a meeting
+
+end
+
+scheduler -> meeting: create(meetingOwner, date, duration)
+
+scheduler -> meetingRepo: save(meeting)
+
+loop for each user to invite
+
+scheduler -> invitationSender: sendInvitations(meeting, userToInvite)
+
+activate invitationSender
+
+invitationSender -> meetingInvitation: create(meeting, userToInvite)
+
+invitationSender -> meetingInvitationRepo: save(meetingInvitation)
+
+deactivate invitationSender
+
+end
+
+scheduler -> controller: meeting
+
+deactivate scheduler
+
+controller -> ui: meeting
+
+deactivate controller
+
+ui --> eCourseUser: shows meeting details
+
+deactivate ui
+
+@enduml

@@ -1,0 +1,78 @@
+@startuml
+
+title US2005 - List Student Grades
+
+autonumber
+skinparam shadowing false
+
+actor Student as S
+participant "ListStudentGradesUI" as UI <<UI>>
+participant "ListStudentGradesController" as LC <<Application>>
+participant "StudentCoursesProvider" as SS <<Service>>
+participant "EnrolledStudentRepository" as CR <<Repository>>
+participant "TakenExamsProvider" as CS <<Service>>
+participant "TakenExamRepository" as ER <<Repository>>
+
+S --> UI : asks to view a list of his grades
+
+activate UI
+
+UI -> LC: create(userSessionService, studentCoursesProvider, takenExamsProvider)
+
+UI -> LC: studentCourses()
+
+activate LC
+
+LC -> SS: provideStudentInProgressAndClosedCourses(student)
+
+activate SS
+
+SS -> CR: findStudentInProgressAndClosedCourses(student)
+
+activate CR
+
+CR --> SS: courses
+
+deactivate CR
+
+SS --> LC: courses
+
+deactivate SS
+
+LC -> UI: courses
+
+deactivate LC
+
+UI -> UI: menuToSelectCourse(courses)
+
+UI -> LC: takenExamsFromCourse(course)
+
+activate LC
+
+LC -> CS: provideUserGradedTakenExamsFromCourse(student, course)
+
+activate CS
+
+CS -> ER: findUserTakenExamsFromCourse(student, course)
+
+activate ER
+
+ER --> CS: takenExams
+
+deactivate ER
+
+CS --> LC: takenExams
+
+deactivate CS
+
+LC -> UI: takenExams
+
+deactivate LC
+
+UI -> S : displays grades
+
+
+
+deactivate UI
+
+@enduml

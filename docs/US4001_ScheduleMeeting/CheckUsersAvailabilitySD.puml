@@ -1,0 +1,114 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Check Users Availability
+
+participant "ScheduleMeetingController" as controller <<application>>
+participant "MeetingScheduler" as scheduler <<application>>
+participant "UserAvailabilityService" as availabilityService <<application>>
+participant "MeetingAvailabilityService" as meetingAvailabilityService <<application>>
+participant "Meeting" as meeting <<domain>>
+database "MeetingRepository" as meetingRepo <<repository>>
+participant "ClassAvailabilityService" as classAvailabilityService <<application>>
+participant "ListUsersCoursesService" as listUsersCoursesService <<application>>
+participant "ListUserClassesService" as listUserClassesService <<application>>
+participant "MeetingInvitationSender" as invitationSender <<application>>
+
+activate controller
+
+controller -> scheduler : scheduleMeeting(meetingOwner, date, duration, usersToInvite)
+
+activate scheduler
+
+loop for each userToInvite
+
+scheduler -> availabilityService : isUserAvailable(meetingDate, meetingDuration, userToInvite)
+
+activate availabilityService
+
+alt For all users
+
+availabilityService -> meetingAvailabilityService : hasMeeting(dateTime, duration, user)
+
+activate meetingAvailabilityService
+
+meetingAvailabilityService -> meetingRepo : findUserMeetings(user)
+
+activate meetingRepo
+
+meetingRepo -> meetingAvailabilityService : user to invite meetings
+
+deactivate meetingRepo
+
+meetingAvailabilityService -> meetingAvailabilityService : isTimeOverlapping(userToInviteMeeting, dateTime, duration)
+
+note right of meetingAvailabilityService: Check if the user has a meeting at the same time
+
+meetingAvailabilityService -> availabilityService: true or false
+
+end
+
+deactivate meetingAvailabilityService
+
+availabilityService -> scheduler: true or false
+
+scheduler -> scheduler: add user to availableUsersToAttendMeeting if true
+
+alt if a user is not a manager
+
+availabilityService -> classAvailabilityService : hasClass(dateTime, duration, user)
+
+activate classAvailabilityService
+
+classAvailabilityService -> listUsersCoursesService : lisUserActiveCourses(user)
+
+activate listUsersCoursesService
+
+listUsersCoursesService -> classAvailabilityService : user active courses
+
+note right of listUsersCoursesService: Abstract the diagram for simplicity (Not representing repositories)
+
+deactivate listUsersCoursesService
+
+classAvailabilityService -> listUserClassesService : listUserClasses(userCourse, dateTime, user)
+
+activate listUserClassesService
+
+listUserClassesService -> classAvailabilityService : user classes
+
+deactivate listUserClassesService
+
+classAvailabilityService -> classAvailabilityService : isClassOverlapping(userClass, dateTime, duration)
+
+note right of classAvailabilityService: Check if the user has a class at the same time
+
+classAvailabilityService -> availabilityService: true or false
+
+end
+
+deactivate classAvailabilityService
+
+availabilityService -> scheduler: true or false
+
+deactivate availabilityService
+
+scheduler -> scheduler: add user to availableUsersToAttendMeeting if true
+
+
+
+end
+
+scheduler -> controller : meeting
+
+note right of controller: The steps required to return the meeting are represented in the first diagram
+
+deactivate scheduler
+
+deactivate controller
+
+@enduml

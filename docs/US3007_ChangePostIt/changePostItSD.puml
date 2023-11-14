@@ -1,0 +1,116 @@
+@startuml
+
+autonumber
+
+title Change Post-It
+
+actor "User" as user
+participant "Browser" as browser <<HTTP>>
+participant "PostItEndpointProcessor" as processor <<application>>
+participant "ChangePostItRequest" as request <<dto>>
+participant "ChangePostItController" as controller <<application>>
+participant "IPostItManager" as manager <<application>>
+participant "IPostItProvider" as provider <<application>>
+participant "Board" as Board <<domain>>
+participant "PostIt" as Post <<domain>>
+participant "BoardLogger" as logger <<application>>
+database "BoardLogRepository" as logRepo <<repository>>
+participant "BoardLog" as BoardLog <<domain>>
+database "PostItRepository" as postItRepo <<repository>>
+
+user -> browser: change post-it
+activate browser
+
+browser -> processor: processRequest(request)
+activate processor
+
+processor -> request: create(boardId, row, column, content)
+
+processor -> controller: create(boardRepository)
+activate controller
+
+note left of controller
+For the row, column and content there will be
+two varibles, containing the old and new values.
+So, for the row, there will a oldRow and newRow
+end note
+processor -> controller: changePostIt(user, board, row, column, content)
+
+
+
+controller -> manager: changePostIt(user, row, column, content, color)
+
+activate manager
+manager -> Board: findCell(oldRow, oldColumn)
+
+activate Board
+Board -> manager : return cell
+deactivate Board
+
+manager -> provider: providePostItByCell(cell)
+
+activate provider
+provider -> postItRepo: findPostItByCell(cell)
+
+activate postItRepo
+postItRepo -> provider: return postIt
+deactivate postItRepo
+
+provider -> manager: return postIt
+deactivate provider
+
+manager -> Post: changeContent(oldContent, newContent, color)
+manager -> controller: return postIt
+deactivate manager
+
+
+
+
+controller -> manager: movePostIt(user, board, postIt, newRow, newColumn)
+
+activate manager
+manager -> Board: findCell(newRow, newColumn)
+activate Board
+Board -> manager : return cell
+deactivate Board
+
+manager -> provider: hasPostIt(cell)
+activate provider
+provider -> postItRepo: findPostItByCell(cell)
+activate postItRepo
+postItRepo -> provider: return postIt
+deactivate postItRepo
+
+provider -> manager: return postIt
+deactivate provider
+
+manager -> Post: replaceCell(user, newCell)
+manager -> controller: return postIt
+deactivate manager
+
+
+controller -> logger: logPostItChange(board, user)
+activate logger
+logger -> BoardLog: create(component, operationType)
+logger -> logRepo: save(boardLog)
+activate logRepo
+logRepo -> logger: return boardLog
+deactivate logRepo
+deactivate logger
+
+controller -> postItRepo : save(postIt)
+activate postItRepo
+postItRepo -> controller : return postIt
+deactivate postItRepo
+
+controller --> processor: return postIt
+deactivate controller
+
+processor --> browser: return success
+deactivate processor
+
+browser --> user: show success
+
+
+
+@enduml

@@ -1,0 +1,23 @@
+NUMERICAL:Evaluate the expression -> √(5^2) - 3 × 4
+ANSW:
+POSITION:SEC1-1
+
+BOOLEAN:Is Mount Everest the tallest mountain in the world?
+ANSW:null
+POSITION:SEC2-1
+
+SHORTANSWER:Which country has the largest economy in the world?
+ANSW:
+POSITION:SEC3-1
+
+MISSINGWORD:The [[n]] is longest movie ever made
+ANSW:null
+POSITION:SEC4-1
+
+MULTIPLECHOICE:What is the capital of Switzerland?
+ANSW:null
+POSITION:SEC5-1
+
+MATCHING:Match the country with its national animal
+MATCHES:Canada-Beaver,South Africa-Springbok,Australia-Kangaroo,India-Tiger
+POSITION:SEC6-1

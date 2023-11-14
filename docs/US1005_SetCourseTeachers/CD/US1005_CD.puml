@@ -1,0 +1,71 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US1005 - Set Course's teachers
+
+package usermanagement{
+    interface IeCourseUserRepository{
+        +findAllTeachers() : Iterable<ECourseUser>
+    }
+}
+
+package coursemanagement {
+
+    package repository{
+        interface CourseRepository{
+            +findAllNotClosedCoursesWithoutTeacherInCharge() : Iterable<Course>
+            +findAllNotClosedCourses() : Iterable<Course>
+            +findCourseTeachers(course) : Iterable<ECourseUser>
+            +save(course) : Optional<Course>
+        }
+    }
+
+    package application {
+
+        class ListManagerCoursesController {
+            +ListManagerCoursesController(courseRepository)
+            +findAllNotClosedCourses(): Iterable<Course>
+        }
+
+        class SetCourseTeachersController {
+            +SetCourseTeachersController(courseRepository, availableTeachersService)
+            +notClosedCoursesWithoutTeacherInCharge() : Iterable<Course>
+            +notClosedCourses() : Iterable<Course>
+            +availableTeachers() : Iterable<ECourseUser>
+            +defineCourseTeacherInCharge(teacher) : void
+            +addTeacherToCourse(teacher) : void
+        }
+
+        interface IAvailableTeachersService {
+            +availableTeachers(course) : Iterable<ECourseUser>
+        }
+    }
+
+    ListManagerCoursesController ..> CourseRepository
+    SetCourseTeachersController ..> CourseRepository
+    IAvailableTeachersService ..> IeCourseUserRepository
+    SetCourseTeachersController ..> IAvailableTeachersService
+    SetCourseTeachersController ..> ListManagerCoursesController
+
+    package domain {
+        class Course {
+            +addTeacher(teacher) : void
+            +defineTeacherInCharge(teacher) : void
+        }
+    }
+
+    IAvailableTeachersService ..> Course
+    ListManagerCoursesController ..> Course
+    SetCourseTeachersController ..> Course
+
+
+}
+
+package ui {
+    class SetCourseTeachersUI {
+    }
+}
+
+SetCourseTeachersUI ..> SetCourseTeachersController
+
+@enduml

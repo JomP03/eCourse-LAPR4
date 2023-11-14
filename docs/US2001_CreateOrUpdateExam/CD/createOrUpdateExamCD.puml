@@ -1,0 +1,124 @@
+@startuml
+
+left to right direction
+title US2001 - Create/Update an Exam Class Diagram
+
+
+package ui {
+        class CreateAutomatedExamUI {
+        }
+        class UpdateAutomatedExamUI{
+        }
+    }
+
+package exammanagement {
+    package application {
+        class CreateAutomatedExamController {
+           +CreateAutomatedExamController(listTeacherCoursesController, examRepository, automatedExamHandler, userSessionService)
+           -verifyExamCreator()
+           +teacherCourses() : List<Course>
+           +createAutomatedExam(filePath, selectedCourse) : AutomatedExam
+        }
+
+        class UpdateAutomatedExamController {
+              +UpdateAutomatedExamController(userSessionService, teacherCoursesProvider, courseExamsProvider, courseRepository, examRepository)
+              -verifyExamCreator()
+              +teacherCourses() : List<Course>
+              +courseAutomatedExams(course) : List<AutomatedExam>
+              +createExamFileFromAutomatedExam(selectedExam, path)
+              +updateAutomatedExam(filePath, selectedCourse, exam) : AutomatedExam
+        }
+    }
+
+    package repository {
+        interface ExamRepository {
+            findExamByTitle(examTitle) : Exam
+        }
+    }
+
+    package domain {
+        abstract Exam {}
+
+        class AutomatedExam {}
+
+        class ExamSection {}
+
+        class ExamOpenPeriod{}
+
+        class ExamHeader{}
+
+        class ExamOpenPeriod {}
+
+        class ExamFileCreator{
+           +createExamFile(exam, path)
+        }
+
+        class ExamParseTreeVisitor{
+            +getExamBuilder() : AutomatedExamBuilder
+            +visitExam(ctx)
+        }
+
+        enum FeedbackType{}
+
+        enum GradingType{}
+
+        interface ExamHandler{
+            parseAutomatedExam(path, selectedCourse, teacher) : AutomatedExam
+        }
+
+        class AutomatedExamBuilder {
+            +withCourse(course)
+            +withExamTitle(title)
+            +withOpenDate(openDate)
+            +withCloseDate(closeDate)
+            +withCreator(creator)
+            +withHeader(description, gradingFeedbackType, feedbackType)
+            +withSection(section)
+            +build(): AutomatedExam
+        }
+    }
+}
+
+package questionmanagement{
+    package domain{
+        abstract Question{}
+        class BooleanQuestion
+        class MultipleChoiceQuestion
+        class MatchingQuestion
+        class NumericalQuestion
+        class MissingWordQuestion
+    }
+}
+
+
+Exam --> ExamHeader
+AutomatedExam -r--|> Exam
+AutomatedExam --> ExamOpenPeriod
+Exam ----> ExamSection
+AutomatedExamBuilder ---> AutomatedExam
+AutomatedExamBuilder --> ExamRepository
+AutomatedExamBuilder ---> ExamParseTreeVisitor
+ExamHeader -> FeedbackType
+ExamHeader --> GradingType
+ExamSection -> Question
+
+CreateAutomatedExamController ---> ExamRepository
+CreateAutomatedExamController -> AutomatedExamBuilder
+CreateAutomatedExamController --> ExamHandler
+UpdateAutomatedExamController ----l---> ExamRepository
+UpdateAutomatedExamController -> ExamFileCreator
+CreateAutomatedExamUI --> CreateAutomatedExamController
+UpdateAutomatedExamUI -> UpdateAutomatedExamController
+ExamRepository -> AutomatedExam
+ExamHandler --> ExamRepository
+ExamHandler --> AutomatedExamBuilder
+ExamHandler --> AutomatedExam
+
+ExamParseTreeVisitor ----> Question
+BooleanQuestion --u|> Question
+MultipleChoiceQuestion -d-|> Question
+MatchingQuestion -l|> Question
+NumericalQuestion ---|> Question
+MissingWordQuestion ---|> Question
+
+@enduml

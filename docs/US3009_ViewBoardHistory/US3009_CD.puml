@@ -1,0 +1,91 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title US3009 - View board history
+
+
+package boardcommunication {
+    package http {
+        class HTTPmessage {
+            -isRequest : boolean
+            -method : String
+            -uri : String
+            -content : byte[]
+            -contentType : String
+            -authorization : String
+            -status : String
+            +HTTPmessage(inputStream)
+            +send(outputStream)
+            +getMethod() : String
+            +getUri() : String
+            +getContent() : byte[]
+            +setContentFromString(content)
+            +setContentFromFile(file)
+        }
+
+        class HttpRequestHandler {
+            +run() : void
+        }
+
+        package endpoints {
+            interface EndpointProcessor {
+                +process(request, response) : void
+            }
+
+            class EndpointProcessorFactory {
+                +getProcessor(request) : EndpointProcessor
+            }
+
+            class HistoryLogEndpointProcessor {
+                +process(request, response) : void
+                -redirectAccordingToMethod() : void
+                -getHistoryLog() : void
+            }
+        }
+    }
+
+    EndpointProcessorFactory ..> EndpointProcessor
+    HistoryLogEndpointProcessor --|> EndpointProcessor
+
+    HttpRequestHandler ..> EndpointProcessorFactory
+    HttpRequestHandler ..> HTTPmessage
+    EndpointProcessorFactory ..> HTTPmessage
+    EndpointProcessor ..> HTTPmessage
+
+
+}
+
+package boardlogmanagement {
+
+    interface IBoardLogsProvider {
+        +retrieveLogsByBoardID(long id) : List<BoardLog>
+    }
+
+    package repository {
+
+        interface IBoardLogRepository {
+            +findBoardLogByBoardID(long id) : BoardLog
+        }
+
+    }
+
+    package domain {
+
+        class BoardLog {}
+    }
+
+    HistoryLogEndpointProcessor ..> IBoardLogsProvider
+
+    IBoardLogsProvider ..> IBoardLogRepository
+
+    IBoardLogRepository ..> BoardLog
+
+
+
+
+}
+
+
+
+
+@enduml

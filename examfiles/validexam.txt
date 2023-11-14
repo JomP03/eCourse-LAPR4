@@ -1,0 +1,44 @@
+TITLE:Teste de Perguntas
+HEADER:Teste de Perguntas
+FEEDBACK:NONE
+GRADINGTYPE:NONE
+OPENDATE:10/10/2025 13-00
+CLOSEDATE:10/10/2026 13-00
+
+
+SECTIONHEADER:header
+
+SHORT_ANSWER:What is the capital of France?
+ANSW:Paris
+GRADE:10
+
+MULTIPLE_CHOICE:What is the capital of France?
+CORANSW:Paris
+GRADE:10
+ANSW:Paris
+ANSW:Portugal
+
+MATCHING: Match the country with its capital
+MATCHES:France-Paris , United Kingdom-London
+GRADE:10
+
+BOOLEAN:Is the sun a star?
+ANSW:TRUE
+GRADE:10
+
+NUMERICAL:What is the square root of 16?
+ANSW:4
+GRADE:10
+
+SECTIONHEADER:header
+
+MISSING_WORD:eu gosto de [[n]], e tu gostas de [[n]] .
+GRADE:10
+CORANSW:chourico
+ANSW:pao
+ANSW:chourico
+ANSW:trigo
+CORANSW:pao
+ANSW:pao
+ANSW:chourico
+ANSW:trigo

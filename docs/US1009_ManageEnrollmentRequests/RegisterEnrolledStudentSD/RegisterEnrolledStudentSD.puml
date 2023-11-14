@@ -1,0 +1,64 @@
+@startuml
+
+autonumber
+skinparam handwritten true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Register Enrolled Student
+
+participant "ApproveEnrollmentRequestsUI" as AUI <<ui>>
+participant "ApproveEnrollmentRequestsController" as AController <<application>>
+participant "RegisterEnrolledStudentController" as Controller <<application>>
+database "EnrolledStudentRepository" as CRepo <<repository>>
+participant "EnrolledStudentBuilder" as ESB <<domain>>
+participant "EnrolledStudent" as ES <<domain>>
+
+activate AUI
+
+AUI -> AController: approveEnrollmentRequest(eCourseUser, course)
+
+activate AController
+
+AController -> Controller: registerEnrolledStudent(eCourseUser, course)
+
+activate Controller
+
+Controller -> CRepo: isStudentAlreadyEnrolled(eCourseUser, course)
+
+activate CRepo
+
+CRepo -> Controller: true | false
+
+deactivate CRepo
+
+Controller -> ESB: create()
+
+Controller -> ESB: withECourseUser(eCourseUser)
+
+Controller -> ESB: withCourse(course)
+
+Controller -> ESB: build()
+
+activate ESB
+
+ESB -> ES: create(eCourseUser, course)
+
+ESB -> Controller: enrolledStudent
+
+deactivate ESB
+
+Controller -> CRepo: save(enrolledStudent)
+
+Controller -> AController: return success
+
+deactivate Controller
+
+AController -> AUI: display success
+
+deactivate AController
+
+deactivate AUI
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml
+
+left to right direction
+
+
+package ui {
+        class CloseEnrollmentsUI {
+        }
+    }
+
+package coursemanagement {
+
+
+    package application {
+        interface ChangeCourseStateController {
+            +findCourses() : Iterable<Course>
+            +changeCourseState(course)
+        }
+
+        class CloseEnrollmentsController {
+            +findCourses() : Iterable<Course>
+            +changeCourseState(course)
+        }
+
+        class ListCourseByStateService {
+            +findCoursesByState(state) : Iterable<Course>
+        }
+    }
+
+    package repository {
+        interface CourseRepository {
+            +findByState(state): Iterable<Course>
+        }
+    }
+
+    package domain {
+        class Course {
+            +closeEnrollments()
+        }
+    }
+}
+
+package enrolledstudentmanagment {
+
+    package repository {
+        interface EnrolledStudentRepository {
+            +doesCourseHasMinimumNumberEnrolledStudents(course) : boolean
+        }
+}
+
+ChangeCourseStateController -|> CloseEnrollmentsController
+CloseEnrollmentsUI --> CloseEnrollmentsController
+ListCourseByStateService --> CourseRepository
+CloseEnrollmentsController -> Course
+CloseEnrollmentsController -> ListCourseByStateService
+CourseRepository -> Course
+CloseEnrollmentsController -> CourseRepository
+CloseEnrollmentsController -u-> EnrolledStudentRepository
+
+@enduml

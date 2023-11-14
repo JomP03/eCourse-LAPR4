@@ -1,0 +1,83 @@
+@startuml
+
+left to right direction
+
+package ui {
+
+    class CreateFormativeExamUI {}
+
+}
+
+package exammanagement {
+
+    package application {
+
+        class CreateFormativeExamController {
+            +listTeacherActiveCourses(): Iterable<Course>
+            +submitCourse(course): void
+            +submitTopSection(title, header): void
+            +submitSection(sectionDescription, questionType, numberQuestions): void
+            +removeSections(): void
+            +submitExam(): void
+            +saveExam(): void
+        }
+
+        interface QuestionProvider {
+            +listQuestionsByType(questionType, numberQuestions): Iterable<Question>
+        }
+
+    }
+
+    package domain {
+        class FormativeExam {}
+
+        class FormativeExamBuilder {
+            +withCreator(creator): void
+            +withTitle(title): void
+            +withHeader(header): void
+            +withCourse(course): void
+            +withSection(sectionDescription, questions): void
+            +removeSections(): void
+            +build(): FormativeExam
+        }
+    }
+
+    package repository {
+        interface ExamRepository {}
+    }
+}
+
+package questionmanagment {
+
+    interface QuestionRepository {
+        +findAllByType(questionType): Iterable<Question>
+    }
+}
+
+package ecourseusermanagement {
+
+    class UserSessionService {
+        getLoggedUser(): ECourseUser
+    }
+}
+
+package coursemanagment {
+
+    class TeacherCoursesProvider {
+        +provideUserActiveCourses(): Iterable<Course>
+    }
+}
+
+
+CreateFormativeExamUI --> CreateFormativeExamController
+CreateFormativeExamController --> UserSessionService
+CreateFormativeExamController -> FormativeExamBuilder
+CreateFormativeExamController -> TeacherCoursesProvider
+CreateFormativeExamController --> QuestionProvider
+CreateFormativeExamController --> ExamRepository
+QuestionProvider --> QuestionRepository
+FormativeExamBuilder -> FormativeExam
+ExamRepository --> FormativeExam
+
+
+@enduml

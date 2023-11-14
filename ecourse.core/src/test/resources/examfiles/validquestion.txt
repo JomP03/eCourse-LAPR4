@@ -1,0 +1,3 @@
+SHORT_ANSWER:What is the capital of France?
+ANSW:Paris
+GRADE:10

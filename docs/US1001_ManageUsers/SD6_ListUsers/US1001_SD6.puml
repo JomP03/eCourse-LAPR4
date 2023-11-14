@@ -1,0 +1,26 @@
+@startuml
+
+title Enable User Sequence Diagram
+
+autonumber
+actor Manager as M
+participant "ListUsersUI" as UI <<ui>>
+participant "ListUsersController" as CTRL <<application>>
+database "ECourseUserRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+activate UI
+UI -> CTRL : create(userRepo)
+UI -> CTRL : allUsers()
+activate CTRL
+CTRL -> REPO : findAllUsers()
+activate REPO
+REPO --> CTRL : users
+deactivate REPO
+CTRL --> UI : users
+deactivate CTRL
+UI -> M : lists the users
+
+
+@enduml

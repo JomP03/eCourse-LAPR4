@@ -1,0 +1,108 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+autonumber
+actor Teacher as T
+participant "ExtraClassScheduleUI" as UI <<presentation>>
+participant "ExtraClassScheduleController" as SC <<application>>
+participant "ListTeacherCoursesController" as LC <<application>>
+database "CourseRepository" as CR <<repository>>
+participant "ListAvailableClassSlotsController" as LAC <<application>>
+participant "ListCourseStudentsController" as LCS <<application>>
+database "EnrolledStudentRepository" as SR <<repository>>
+participant "UserSessionService" as USS <<application>>
+database "UserRepository" as URepo <<repository>>
+participant "ClassScheduler" as CSS <<service>>
+participant "ExtraClassBuilder" as CB <<builder>>
+participant "ExtraClass" as CL <<domain>>
+database "ClassRepository" as CLR <<repository>>
+
+
+
+activate T
+T -> UI : Asks to schedule a class
+activate UI
+UI -> SC : getTeacherActiveCourseList()
+activate SC
+SC -> LC : getTeacherActiveCourseList()
+activate LC
+LC--> CR : findAvailableTeacherCourses()
+activate CR
+CR --> LC : returns courseList
+deactivate CR
+LC --> SC : returns courseList
+deactivate LC
+SC --> UI : courseList
+deactivate SC
+UI -> UI : display courseList, and the\n possible weeks to schedule the class
+T -> UI : provides the course and\n the week to schedule the class
+UI -> SC : getAvailableExtraClassSlots()
+activate SC
+SC -> LAC : getAvailableExtraClassSlotsForAWeek()
+activate LAC
+LAC -> USS: getLoggedUser()
+activate USS
+USS -> URepo: findByEmail(email)
+activate URepo
+URepo -> USS: eCourseUser
+deactivate URepo
+USS -> LAC: eCourseUser
+deactivate USS
+LAC -> CSS : getAvailableExtraClassSlotsForAWeek()
+activate CSS
+CSS--> CLR : findCourseRecurrentClasses(course)
+activate CLR
+CLR --> CSS : returns courseRecurrentClasses
+CSS -> CLR : findCourseExtraClasses(course)
+CLR --> CSS : returns courseExtraClasses
+CSS -> CLR : findTeacherExtraClasses(course)
+CLR --> CSS : returns teacherExtraClasses
+deactivate CLR
+CSS -> CSS : calculates availableExtraClassSlots
+deactivate CLR
+CSS -> LAC : returns availableExtraClassSlots
+deactivate CSS
+LAC --> SC : returns availableExtraClassSlots
+deactivate LAC
+SC --> UI : availableExtraClassSlots
+deactivate SC
+UI -> SC : getStudentsFromCourse(course)
+activate SC
+SC -> LCS : getStudentsFromCourse(course)
+activate LCS
+LCS -> SR: findStudentsFromCourse(course)
+activate SR
+SR -> LCS: enrolledStudents
+deactivate SR
+LCS -> SC: enrolledStudents
+deactivate LCS
+SC -> UI : enrolledStudents
+UI -> UI : display availableExtraClassSlots \n and the possible participants
+T -> UI : provides the class slot \n and the participants
+UI -> T : requests the class data
+T -> UI : provides the class data
+UI -> SC : scheduleClass()
+activate SC
+SC -> CSS : scheduleExtraClass()
+activate CSS
+CSS -> CB : build()
+activate CB
+CB -> CL : create()
+CB -> CSS : returns class
+deactivate CB
+CSS -> CSS : validates the class
+CSS -> CLR : save(class)
+CSS -> SC : returns success
+deactivate CSS
+SC -> UI : shows success
+deactivate SC
+UI -> T : shows success
+
+
+deactivate UI
+
+@enduml

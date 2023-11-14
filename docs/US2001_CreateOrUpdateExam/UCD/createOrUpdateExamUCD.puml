@@ -1,0 +1,24 @@
+@startuml
+
+left to right direction
+title 2001 - Create/Update an Exam
+skinparam titleBorderRoundCorner 20
+skinparam titleBorderThickness 2
+skinparam arrowThickness 3
+
+'**********Teacher Use Case*************
+
+:Teacher: as T
+
+Usecase TU01 as "Create an exam"
+
+'**********Student Use Case*************
+
+:Teacher: as T
+
+Usecase TU02 as "Update an exam"
+
+T -d- TU01
+T -d- TU02
+
+@enduml

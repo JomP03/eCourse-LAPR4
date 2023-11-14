@@ -1,0 +1,103 @@
+@startuml
+
+left to right direction
+title US3007 - Change Post-It
+
+
+package postitmanagement {
+
+    package domain() {
+
+        class PostIt {
+            +changeContent(user, previousContent, content, color)
+            +replaceCell(user, newCell)
+        }
+    }
+
+    package application {
+
+        class ChangePostItController {
+            +changePostIt(user, board, oldRow, oldColumn, newRow, newColumn,
+            oldContent, newContent, color)
+        }
+
+        interface IPostItManager {
+            +changePostItContent(user, board,
+                        oldRow, oldColumn, oldContent, newContent, color) : PostIt
+            +movePostIt(user, board, postIt, newRow, newColumn) : PostIt
+        }
+    }
+
+    package repository {
+
+        interface PostItRepository {
+            +save(postIt) : PostIt
+        }
+    }
+}
+
+package boardlogmanagement {
+    package application {
+        interface BoardLogger {
+            +logChangePostIt(board) : void
+        }
+    }
+
+    package domain {
+        class BoardLog {}
+    }
+
+    package repository {
+        interface BoardLogRepository {
+            +save(boardLog) : BoardLog
+        }
+    }
+}
+
+package boardmanagement {
+
+    package domain {
+        class Board {
+            +findBoardCell(row, column) : BoardCell
+        }
+    }
+
+    package application {
+        interface IBoardSynchronizer {
+            +getBoardCellLock(lockKey) : Object
+            +createBoardCellLock(boardId, row, column) : String
+        }
+    }
+}
+
+package boardcommunication {
+    class ChangePostItRequest {
+        +board
+        +oldRow
+        +oldColumn
+        +newRow
+        +newColumn
+        +oldContent
+        +newContent
+    }
+
+    class PostItEndpointProcessor {
+        +processRequest(request, response)
+    }
+}
+
+PostItEndpointProcessor -> ChangePostItRequest
+ChangePostItRequest --> ChangePostItController
+
+ChangePostItController -> IBoardSynchronizer
+ChangePostItController -> BoardLogger
+ChangePostItController -> PostItRepository
+ChangePostItController --> IPostItManager
+
+IPostItManager -> PostIt
+IPostItManager --> Board
+
+BoardLogger --> BoardLog
+BoardLogger --> BoardLogRepository
+
+@enduml

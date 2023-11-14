@@ -1,0 +1,1 @@
+void editPostit(SharedBoard *shared_board, sem_t **semaphores);

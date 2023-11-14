@@ -1,0 +1,55 @@
+@startuml
+
+title Close Enrollments - Diagram
+
+autonumber
+actor Manager as M
+participant "CloseEnrollmentsUI" as UI <<UI>>
+participant "CloseEnrollmentsController" as Controller <<Application>>
+participant "ListCourseByStateService" as Service <<Application>>
+database "CourseRepository" as CRepo <<Persistence>>
+database "EnrolledStudentRepository" as ERepo <<Persistence>>
+participant "Course" as C <<Domain>>
+
+
+activate UI
+M --> UI : onLoad
+UI --> Controller : create(ListCourseByStateService, CourseRepository, EnrolledStudentRepository)
+activate Controller
+UI -> Controller: findCourses()
+Controller -> Service: findCourseByState(state)
+activate Service
+Service -> CRepo: findByState(state)
+activate CRepo
+CRepo -> Service: returns courses
+deactivate CRepo
+Service -> Controller: returns courses
+deactivate Service
+Controller -> UI: returns courses
+deactivate Controller
+UI --> M: display courses
+
+
+M --> UI : choose course
+
+
+UI -> Controller: changeCourseState(course)
+activate Controller
+Controller -> ERepo : doesCourseHasMinimumNumberEnrolledStudents(course)
+activate ERepo
+ERepo -> Controller : returns true
+deactivate ERepo
+Controller -> C : closeEnrollments()
+
+
+
+
+Controller -> CRepo: save(course)
+activate CRepo
+CRepo -> Controller: returns sucess
+deactivate CRepo
+Controller -> UI: returns sucess
+deactivate Controller
+UI --> M: shows sucess
+
+@enduml

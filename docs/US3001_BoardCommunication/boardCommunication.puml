@@ -1,0 +1,31 @@
+@startuml
+
+left to right direction
+
+
+class ECourseBoardServerApp {}
+
+package handler {
+
+    class TcpServerMessageHandler {}
+}
+
+class ECourseBoardClientApp {}
+
+class BoardClient {}
+
+package boardcommunication {
+
+    class RequestMessage {}
+
+    enum MessageCode {}
+}
+
+ECourseBoardClientApp --> BoardClient
+ECourseBoardServerApp --> TcpServerMessageHandler
+TcpServerMessageHandler --> RequestMessage
+BoardClient --> RequestMessage
+RequestMessage --> MessageCode
+
+
+@enduml

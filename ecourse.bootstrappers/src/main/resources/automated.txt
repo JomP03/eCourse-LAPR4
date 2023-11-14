@@ -1,0 +1,12 @@
+NUMERICAL:How many phases does DevOps have?
+ANSW:2
+POSITION:SEC1-1
+
+BOOLEAN:Is DevOps a culture?
+ANSW:true
+POSITION:SEC1-2
+
+MULTIPLECHOICE:What is the name of the language?[DevOps, Java, C#, C++]
+ANSW:java
+POSITION:SEC1-3
+

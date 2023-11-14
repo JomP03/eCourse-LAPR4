@@ -1,0 +1,132 @@
+@startuml
+
+autonumber
+
+actor Student as S
+participant "TakeFormativeExamUI" as UI <<UI>>
+participant "TakeExamController" as Controller <<Application>>
+participant "UserSessionService" as US <<Application>>
+participant "StudentCoursesProvider" as CourseProvider <<Repository>>
+participant "CourseExameProvider" as ExamProvider <<Repository>>
+participant "TakenExamHandler" as Handler <<Domain>>
+participant "TakenExamVisitor" as Visitor <<Domain>>
+participant "TakenExamBuilder" as Builder <<Domain>>
+participant "TakenExamCorrector" as Corrector <<Domain>>
+participant "TakenExam" as TakenExam <<Domain>>
+participant "Question" as Question <<Domain>>
+database "TakenExamRepository" as Erepo <<Repository>>
+
+activate UI
+--> UI : on load
+UI -> Controller : create(userSessionService, courseExamsProvider, studentCoursesProvider)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : returns logged user
+deactivate US
+deactivate Controller
+
+
+UI -> Controller: listStudentInProgressCourses()
+activate Controller
+Controller -> CourseProvider : provideStudentInProgressCourses(user)
+activate CourseProvider
+CourseProvider -> Controller : returns courses
+deactivate CourseProvider
+Controller -> UI : returns courses
+deactivate Controller
+
+UI --> S: shows courses
+S --> UI: selects a course
+
+UI -> Controller: listStudentNonTakenFormativeExamsOfAcourse(course)
+activate Controller
+Controller -> ExamProvider : provideCourseFormativeExams(course)
+activate ExamProvider
+ExamProvider -> Controller : returns formative exams
+deactivate ExamProvider
+Controller -> Controller : isExamAlreadyTaken(exam)
+Controller -> UI : returns formative exams
+deactivate Controller
+
+UI --> S: shows formative exams
+S --> UI: selects a formative exam
+
+    note right of S
+            chooses an exam to take and a json file is generated
+            starts the javafx application
+            javafx app reads the json file and creates the exam structure
+            after taking the exam, a txt will be generated
+            this file will be uploaded to the system
+
+            or
+
+            if in linux, the student will select a directory
+            a txt file with the exam will be generated
+            the student will take the exam in the txt
+            the system gets the file and uploads it
+        end note
+
+UI -> S: requests the file
+S -> UI: uploads the file
+
+UI -> Controller: correctExam(filepath, exam)
+activate Controller
+Controller -> Handler : createTakenExam(file, exam, student)
+activate Handler
+Handler -> Visitor : visit(tree)
+activate Visitor
+
+Visitor --> Builder : create
+activate Builder
+Visitor -> Builder : withAnsweredQuestion(answeredQuestion)
+deactivate Builder
+
+Handler -> Visitor : takenExamBuilder()
+Visitor -> Handler : returns builder
+deactivate Visitor
+Handler -> Builder : withExam(exam)
+activate Builder
+Handler -> Builder : withStudent(student)
+Handler -> Builder : build()
+
+Builder --> TakenExam : create
+deactivate Builder
+deactivate Visitor
+Handler -> Corrector : correctExam(takenExam)
+activate Corrector
+loop for each question
+    Corrector -> Question : correctAnswer(answer)
+    activate Question
+
+        note right of Question
+            As the question knows how to correct itself,
+            it will return the points obtained by the student
+        end note
+    Question -> Corrector : returns obtained quotation
+    deactivate Question
+
+    Corrector -> TakenExam : addQuotation(quotation)
+    activate TakenExam
+    Corrector -> TakenExam : addFeedback(feedback)
+    deactivate TakenExam
+end
+
+Corrector -> Handler : returns takenExam
+deactivate Corrector
+
+Handler -> Controller : returns takenExam
+deactivate Handler
+
+
+
+Controller -> Erepo : save(takenExam)
+activate Erepo
+Erepo -> Controller : returns takenExam
+deactivate Erepo
+Controller -> UI : returns takenExam
+deactivate Controller
+UI -> S: displays takenExam (grade and feedback)
+deactivate UI
+
+@enduml

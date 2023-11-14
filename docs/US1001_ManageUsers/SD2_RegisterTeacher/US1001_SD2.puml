@@ -1,0 +1,46 @@
+@startuml
+
+title Register Teacher Sequence Diagram
+
+autonumber
+actor Manager as M
+participant "RegisterTeacherUI" as UI <<ui>>
+participant "RegisterTeacherController" as CTRL <<application>>
+participant "ECourseUserBuilderFactory" as FAC <<factory>>
+participant "TeacherBuilder" as BLD <<builder>>
+participant "SystemUser" as SU <<f_entity>>
+participant "ECourseUser" as EU <<domain>>
+database "ECourseUserRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+activate UI
+UI -> CTRL : create(userRepo, userBuilderFactory)
+UI --> M : asks input of\n teacher details
+M -> UI : inputs teacher details
+UI -> CTRL : registerTeacher(username, pwd, firstName,\n lastName, email, acronym, birthdate, taxNumber)
+activate CTRL
+CTRL -> FAC : createECourseUserBuilder(role)
+activate FAC
+FAC -> BLD : create
+FAC --> CTRL : builder
+deactivate FAC
+CTRL -> SU : create
+CTRL -> BLD : withSystemUser(sysUser)
+CTRL -> BLD : withBirthDate(birthdate).
+CTRL -> BLD : withTaxPayerNumber(taxNumber)
+CTRL -> BLD : withAcronym(acronym)
+CTRL -> BLD : build()
+activate BLD
+BLD -> EU : create(sysUser, birthdate,\n taxNumber, acronym, state)
+BLD --> CTRL : user
+deactivate BLD
+CTRL -> REPO : save(user)
+CTRL --> UI : returns success
+deactivate CTRL
+UI --> M : displays success
+
+
+
+
+@enduml

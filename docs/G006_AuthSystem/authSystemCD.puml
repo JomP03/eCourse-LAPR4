@@ -1,0 +1,120 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+'direction
+left to right direction
+
+'title
+title Authentication System Class Diagram
+
+package UI {
+class LoginUI {
+ - DEFAULT_MAX_ATTEMPTS: int
+  - onlyWithThis: Role
+  - maxAttempts: int
+  + LoginUI(CredentialHandler, Role)
+  }
+}
+
+package Auth {
+interface CredentialHandler {
+  + authenticated(username, password, requiredRole)
+}
+
+class AuthenticationCredentialHandler {
+  + authenticated(username, password, requiredRole)
+}
+CredentialHandler ...|> AuthenticationCredentialHandler
+}
+
+package EAPLIFramework {
+interface Authenticator {
+  + authenticate(username, password, requiredRole)
+}
+class AuthenticationService {
+  + authenticate(username, password, requiredRole)
+}
+class SystemUser {
+- username: String
+- password: String
+- name: String
+- Email: String
+- active: boolean
+}
+note left of SystemUser
+  The properties of the user are simplified.
+  In reality there is actually a Value Object
+  for all the properties, expect the "active".
+  Other not relevant properties are not being shown.
+end note
+
+class AuthorizationService {
++ createSessionForUser(user)
++ clearSession()
++ hasSession()
++ session()
++ ensureAuthenticatedUserHasAnyOf(roles)
++ loggedinUserWithPermissions(roles)
+}
+class UserSession {
+- token: UUID
+- startedOn: Calendar
+}
+package persistence {
+
+class DomainRepository {
++ save(entity)
++ findAll()
++ ofIdentity(id)
++ containsOfIdentity(id)
++ contains(entity)
++ delete (entity)
++ deleteOfIdentity(entityId)
++ count()
++ size()
++ remove(entity)
++ removeOfIdentity(entityId)
+}
+
+class UserRepository {
++ findByActive(active)
+}
+
+DomainRepository  <|-- UserRepository
+}
+
+Authenticator ..|> AuthenticationService
+Authenticator "1" -- "1" AuthorizationService
+AuthorizationService "1" -- "           0..1" UserSession
+UserSession "1" -- "1" SystemUser
+}
+
+
+
+package domain {
+class ECourseRoles {
++ {static} STUDENT: Role
++ {static} TEACHER: Role
++ {static} MANAGER: Role
++ {static} SUPERUSER: Role
+}
+}
+
+
+' login ui has a credential handler
+LoginUI "1" -r- "1" CredentialHandler
+
+' credential handler has an authenticator
+CredentialHandler "1" -- "1" Authenticator
+
+' authentication service has a User Repository
+AuthenticationService "1" -- "1" UserRepository
+
+' a user repository has N SystemUser
+UserRepository "1" -- "*" SystemUser
+
+' a user has N roles
+SystemUser "1" -r- "*" ECourseRoles
+
+
+@enduml

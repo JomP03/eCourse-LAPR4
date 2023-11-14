@@ -1,0 +1,74 @@
+@startuml
+
+title US4004 - List Participants of a Meeting
+
+skinparam shadowing false
+left to right direction
+
+package UI {
+
+    class ListMeetingParticipantsUI {}
+
+}
+
+package meetingmanagement {
+
+    package Application {
+        class ListMeetingParticipantsController {
+            + ListMeetingParticipantsController(userSessionService, meetingProvider, meetingInvitationProvider)
+            - verifyUser(): void
+            + meetingsForUser(): List<Meeting>
+            + findMeetingParticipants(): List<ECourseUser>
+        }
+
+        interface MeetingProvider {
+            + provideScheduledMeetingsByOwner(user): List<Meeting>
+            + provideMeetingsByInvitedUser(user): List<Meeting>
+        }
+        }
+
+            package repository{
+                    interface IMeetingRepository {
+                        +findMeetingsByOwner(userToCheck): Iterable<Meeting>
+                    }
+            }
+}
+
+package meetinginvitationmanagement{
+    package application{
+        interface IMeetingInvitationProvider{
+            + provideMeetingInvitationsByMeeting(meeting): Iterable<MeetingInvitation>
+        }
+    }
+
+    package repository{
+            interface IMeetingInvitationRepository {
+                +findMeetingInvitationsByMeeting(meeting): Iterable<MeetingInvitation>
+                +findAllMeetingsByInvitedUser(userToCheck): Iterable<MeetingInvitation>
+            }
+    }
+}
+
+package ecourseusermanagement {
+
+    package application {
+
+        class UserSessionService {
+            + getLoggedUser(): eCourseUser
+        }
+    }
+
+}
+
+ListMeetingParticipantsUI ..> ListMeetingParticipantsController
+ListMeetingParticipantsController --> MeetingProvider
+ListMeetingParticipantsController --> IMeetingInvitationProvider
+ListMeetingParticipantsController -> UserSessionService
+MeetingProvider --> IMeetingRepository
+MeetingProvider --> IMeetingInvitationRepository
+IMeetingInvitationProvider --> IMeetingInvitationRepository
+
+
+
+
+@enduml

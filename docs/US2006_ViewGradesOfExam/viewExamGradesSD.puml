@@ -1,0 +1,75 @@
+@startuml
+
+title View List of Grades of Exams of a Course - Sequence Diagram
+
+autonumber
+actor Teacher as T
+participant "ViewExamGradesUI" as UI <<UI>>
+participant "ViewExamGradesController" as Controller <<Application>>
+participant "UserSessionService" as US <<Application>>
+participant "TeacherCoursesProvider" as CourseProvider <<Application>>
+participant "CourseExamsProvider" as ExamProvider <<Application>>
+participant "TakenExamProvider" as TakenExamProvider <<Application>>
+database "TakenExamRepository" as TakenExamRepo <<Repository>>
+
+
+
+activate UI
+-> UI : onLoad
+UI --> Controller : create(userSessionService, teacherCourseProvider, courseExamsProvider, takenExamProvider)
+activate Controller
+Controller -> US : getLoggedUser()
+activate US
+US -> Controller : returns logged user
+deactivate US
+Controller -> Controller : verifyUserIsTeacher()
+Controller --> UI :
+deactivate Controller
+
+UI -> Controller : listTeacherCourses()
+activate Controller
+Controller -> CourseProvider : provideUserActiveCourses(teacher)
+activate CourseProvider
+CourseProvider -> Controller : returns courses
+deactivate CourseProvider
+Controller -> UI : returns courses
+deactivate Controller
+
+UI --> T : display courses
+T --> UI : select course
+
+UI -> Controller : listCourseExams(course)
+activate Controller
+Controller -> ExamProvider : provideSolvedExams(course)
+activate ExamProvider
+
+note right of ExamProvider : returns exams that have been solved by students
+
+ExamProvider -> Controller : returns exams
+deactivate ExamProvider
+Controller -> UI : returns exams
+deactivate Controller
+
+loop while teacher wants to view grades
+    UI --> T : display exams
+    T --> UI : select exam
+
+    UI -> Controller : listTakenExams(exam)
+    activate Controller
+    Controller -> TakenExamProvider : listTakenExams(exam)
+    activate TakenExamProvider
+    TakenExamProvider -> TakenExamRepo : findByExam(exam)
+    activate TakenExamRepo
+    TakenExamRepo -> TakenExamProvider : returns taken exams
+    deactivate TakenExamRepo
+    TakenExamProvider -> Controller : returns taken exams
+    deactivate TakenExamProvider
+    Controller -> UI : returns taken exams
+    deactivate Controller
+
+    UI --> T : display grades
+
+end
+
+
+@enduml

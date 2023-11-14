@@ -1,0 +1,55 @@
+@startuml
+
+title Register Student Sequence Diagram
+
+autonumber
+actor Manager as M
+participant "RegisterStudentUI" as UI <<ui>>
+participant "RegisterStudentController" as CTRL <<application>>
+participant "ECourseUserBuilderFactory" as FAC <<factory>>
+participant "StudentBuilder" as BLD <<builder>>
+participant "SystemUser" as SU <<f_entity>>
+participant "MechanographicNumberAssigner" as SVC <<service>>
+participant "ECourseUser" as STU <<domain>>
+database "ECourseUserRepository" as REPO <<repository>>
+
+
+-> UI : onLoad
+activate UI
+UI -> CTRL : create(userRepo, userBuilderFactory)
+UI --> M : asks input of\n student details
+M -> UI : inputs student details
+UI -> CTRL : registerStudent(username, pwd, firstName,\n lastName, email, birthdate, taxNumber)
+activate CTRL
+CTRL -> FAC : createECourseUserBuilder(role)
+activate FAC
+FAC -> BLD : create
+FAC --> CTRL : builder
+deactivate FAC
+CTRL -> SU : create
+CTRL -> BLD : withSystemUser(sysUser)
+CTRL -> BLD : withBirthDate(birthdate).
+CTRL -> BLD : withTaxPayerNumber(taxNumber)
+CTRL -> BLD : build()
+activate BLD
+BLD -> SVC : create(userRepo)
+BLD -> SVC : newMechanographicNumber()
+activate SVC
+SVC -> REPO : findLastMechanographicNumberInYear(year)
+activate REPO
+REPO --> SVC : lastMechanographicNumber
+deactivate REPO
+SVC --> BLD : newNumber
+deactivate SVC
+BLD -> STU : create(sysUser, birthdate, taxNumber, newNumber, state)
+BLD --> CTRL : user
+deactivate BLD
+CTRL -> REPO : save(user)
+CTRL --> UI : returns success
+deactivate CTRL
+UI --> M : displays success
+
+
+
+
+@enduml

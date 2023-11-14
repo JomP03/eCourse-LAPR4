@@ -1,0 +1,60 @@
+@startuml
+
+title US3010 - Archive Board
+
+autonumber
+skinparam shadowing false
+
+actor User as U
+participant "Browser" as UI <<UI>>
+participant "HttpRequestHandler" as RH <<HTTP>>
+participant "EndpointProcessorFactory" as PF <<HTTP>>
+participant "ShareBoardEndpointProcessor" as EP <<HTTP>>
+participant "ShareBoardController" as SC <<Application>>
+participant "BoardPermissionHandler" as PH <<Service>>
+participant "Board" as B <<Domain>>
+participant "BoardRepository" as BR <<Repository>>
+
+U --> UI : asks to archive a board
+activate UI
+UI --> U : asks to confirm action
+U --> UI : confirms action
+UI -> RH : GET /shareboard
+activate RH
+RH -> PF : getEndpointProcessor(request)
+activate PF
+PF -> RH : shareBoardEndpointProcessor
+deactivate PF
+RH -> EP : processRequest(request)
+activate EP
+EP -> SC : create(userRepo, boardPermissionHandler ,boardRepo)
+note over EP :  The user is sent by a token that identifies him in the system\nand the board is sent by its ID (check US3005 documentation)
+EP -> SC : availableUsersToShareBoardWith(board, user)
+activate SC
+SC -> EP : users
+deactivate SC
+EP -> EP : setResponse()
+RH -> UI : response
+deactivate EP
+UI --> U : shows list of available users\nand asks to select at least one\n and the permissions to give
+U --> UI : selects users and permissions
+UI -> RH : POST /shareboard
+RH -> PF : getEndpointProcessor(request)
+activate PF
+PF -> RH : shareBoardEndpointProcessor
+deactivate PF
+RH -> EP : processRequest(request)
+activate EP
+EP -> SC : shareBoard(board, userId, read, write)
+activate SC
+SC -> PH : handleBoardSharing(board, userId, read, write)
+activate PH
+PH -> B : add permissions to the board
+deactivate PH
+SC -> BR : save(board)
+deactivate SC
+EP -> EP : setResponse()
+RH -> UI : response
+deactivate EP
+UI --> U : shows success notification
+@enduml

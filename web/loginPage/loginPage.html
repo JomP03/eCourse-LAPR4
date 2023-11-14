@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:ital@1&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <title>Login</title>
+    <link rel="stylesheet" href="loginPage.css">  <!-- Link to CSS file -->
+    <link rel="stylesheet" href="../commons/base-gradient.css">  <!-- Link to CSS file -->
+    <script src="loginPage.js"></script> <!-- Link to JavaScript file -->
+    <script src="../commons/commons.js"></script> <!-- Link to JavaScript file -->
+
+</head>
+<body onload="checkIfLoggedUser()">
+<div class="super-container">
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <ul class="notification-container"></ul>
+
+    <div class="header">
+        <h1 class="title">eCourse</h1>
+    </div>
+
+    <div class="main-container">
+
+        <div class="container">
+            <h1 class="loginLabel">Login</h1>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" id="signin-button">Sign In</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

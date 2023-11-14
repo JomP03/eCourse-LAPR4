@@ -1,0 +1,86 @@
+@startuml
+
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+left to right direction
+
+package ui {
+
+    class ListCourseExamsUI {}
+
+}
+
+package exammanagement {
+
+    package application {
+
+        class ListCourseExamsController {
+
+            + ListCourseExamsController(teacherCoursesProvider, courseExamsProvider)
+            + teacherCourses(teacher): Iterable<Course>
+            + courseExams(course): Iterable<Exam>
+            - verifyLoggedUser(): void
+
+        }
+
+        interface ICourseExamsProvider {
+
+            + listCourseFormativeExams(course): Iterable<FormativeExam>
+            + listCourseAutomatedExams(course): Iterable<AutomatedExam>
+
+        }
+
+    }
+
+    package domain {
+
+        abstract Exam {}
+
+        class FormativeExam {}
+
+        class AutomatedExam {}
+
+    }
+
+    package repository {
+
+        interface IExamRepository {
+
+            + findFormativeExamByCourse(course): Iterable<FormativeExam>
+            + findAutomatedExamByCourse(course): Iterable<AutomatedExam>
+
+        }
+
+    }
+
+}
+
+package coursemanagement {
+
+    package application {
+
+        interface IUserCoursesProvider {
+
+            + listUserCourses(user): Iterable<Course>
+
+        }
+
+    }
+
+}
+
+ListCourseExamsUI ..> ListCourseExamsController
+
+ListCourseExamsController --> ICourseExamsProvider
+ListCourseExamsController ..> IUserCoursesProvider
+
+ICourseExamsProvider --> IExamRepository
+
+IExamRepository ---> Exam
+
+Exam <|-- FormativeExam
+Exam <|-- AutomatedExam
+
+@enduml

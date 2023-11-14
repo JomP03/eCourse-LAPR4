@@ -1,0 +1,12 @@
+SHORTANSWER:Which country has the largest area in the world?
+ANSW:2
+POSITION:SEC1-1
+
+SHORTANSWER:Which country has the largest population in Europe?
+ANSW:3
+POSITION:SEC1-2
+
+BOOLEAN:Is water boiling point 100 degrees Celsius?
+ANSW:true
+POSITION:SEC2-1
+

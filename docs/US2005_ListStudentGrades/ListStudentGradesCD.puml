@@ -1,0 +1,79 @@
+@startuml
+
+title US2005 - List Student Grades
+
+skinparam shadowing false
+left to right direction
+
+package UI {
+
+    class ListStudentGradesUI {}
+
+}
+
+package takenexammanagement {
+
+    package application {
+
+        class ListStudentGradesController {
+
+            - verifyStudent(): void
+            + ListStudentGradesController(userSessionService, studentCoursesProvider, takenExamsProvider)
+            + studentCourses(student): Iterable<Course>
+            + takenExamsFromCourse(course): List<TakenExam>
+
+        }
+
+        interface ITakenExamsProvider {
+
+            + provideUserGradedTakenExamsFromCourse(course, student): List<TakenExam>
+
+        }
+
+    }
+
+    package domain {
+
+        class TakenExam {}
+
+    }
+
+    package repository {
+
+        interface ITakenExamRepository {
+            + findUserTakenExamsFromCourse(course, student): List<TakenExam>
+        }
+
+    }
+
+}
+
+package coursemanagement {
+    package application {
+        interface IUserCoursesProvider {
+            + provideStudentInProgressAndClosedCourses(user): Iterable<Course>
+        }
+
+    }
+
+    package repository {
+        interface IEnrolledStudentRepository {
+            + findStudentInProgressAndClosedCourses(user): Iterable<Course>
+        }
+    }
+
+    package domain {
+        class Course {}
+    }
+
+}
+
+ListStudentGradesUI ..> ListStudentGradesController
+ListStudentGradesController --> ITakenExamsProvider
+ListStudentGradesController ..> IUserCoursesProvider
+ITakenExamsProvider --> ITakenExamRepository
+ITakenExamRepository ---> TakenExam
+IUserCoursesProvider -> ICourseRepository
+ICourseRepository -> Course
+
+@enduml

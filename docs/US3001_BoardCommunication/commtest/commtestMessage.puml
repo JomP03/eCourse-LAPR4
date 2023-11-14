@@ -1,0 +1,38 @@
+@startuml
+
+title COMMTEST Message - Diagram
+
+autonumber
+actor User as U
+participant "BoardClient" as Client <<client>>
+participant "RequestMessage" as M <<boardcommunication>>
+participant "TcpServerMessageHandler" as Handler <<handler>>
+
+
+activate Client
+-> Client : onLoad
+Client --> Handler: beginSession()
+U --> Client : enters data (version, code)
+U --> Client : submit data
+Client -> M : create
+
+
+Client -> Client: writeInt(messageLength)
+Client -> Client: write(message)
+Client --> Handler:
+
+activate Handler
+Handler -> Handler: readInt(messageLength)
+Handler -> Handler: read(message)
+Handler -> Handler: codeFactory(code, version, data)
+Handler -> Handler: sendSuccessResponse(version, outputStream)
+Handler --> Client:
+deactivate Handler
+
+Client -> Client: readInt(messageLength)
+Client -> Client: read(message)
+
+deactivate Server
+Client --> U: shows sucess
+
+@enduml

@@ -1,0 +1,97 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title List Course Exams
+
+actor Teacher as teacher
+participant "ListCourseExamsUI" as ui
+participant "ListCourseExamsController" as controller
+participant "TeacherCoursesProvider" as coursesProvider
+participant "CourseExamsProvider" as provider
+participant "ExamRepository" as examRepository
+
+-> ui: onLoad
+
+activate ui
+
+ui -> controller: create(teacherCoursesProvider, courseExamsProvider)
+
+note over controller: it is here that the logged user is retrieved
+
+ui -> controller: teacherCourses(teacher)
+
+note over controller: get courses for teacher (logged user)
+
+activate controller
+
+controller -> coursesProvider: listUserCourses(teacher)
+
+activate coursesProvider
+
+coursesProvider -> controller: courses
+
+deactivate coursesProvider
+
+controller -> ui: courses
+
+deactivate controller
+
+ui --> teacher: list courses and request course selection
+
+teacher --> ui: select course
+
+ui -> controller: courseExams(course)
+
+activate controller
+
+controller -> provider: provideCourseFormativeExams(course)
+
+activate provider
+
+provider -> examRepository: findFormativeExamByCourse(course)
+
+activate examRepository
+
+examRepository -> provider: formative exams
+
+deactivate examRepository
+
+provider -> controller: formative exams
+
+deactivate provider
+
+controller -> ui: exams
+
+controller -> provider: provideCourseAutomatedExams(course)
+
+activate provider
+
+provider -> examRepository: findAutomatedExamByCourse(course)
+
+activate examRepository
+
+examRepository -> provider: automated exams
+
+deactivate examRepository
+
+provider -> controller: automated exams
+
+deactivate provider
+
+controller -> controller: merge exams
+
+note over controller: a list containing both formative and automated exams is created
+
+controller -> ui: exams
+
+deactivate controller
+
+ui --> teacher: list exams
+
+deactivate ui
+
+@enduml

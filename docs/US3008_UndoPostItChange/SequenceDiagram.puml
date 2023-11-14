@@ -1,0 +1,133 @@
+@startuml
+
+autonumber
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+title Create Post-it
+
+actor "User" as user
+participant "Browser" as browser <<HTTP>>
+participant "HttpRequestHandler" as handler <<HTTP>>
+participant "EndpointProcessorFactory" as factory <<HTTP>>
+participant "PostItEndpointProcessor" as processor <<application>>
+participant "UndoPostItChangeController" as controller <<application>>
+participant "BoardSynchronizer" as sync <<application>>
+participant "PostItManager" as manager <<domain>>
+participant "Board" as board <<domain>>
+participant "PostItProvider" as postItProvider <<application>>
+participant "PostIt" as postIt <<domain>>
+participant "PostItRepository" as repository <<repository>>
+participant "BoardLogger" as logger <<application>>
+
+user -> browser: undo post-it change
+activate browser
+
+browser -> handler:POST /uno
+activate handler
+handler -> factory : getEndpointProcessor(request)
+activate factory
+factory -> handler : createPostItEndpointProcessor
+deactivate factory
+handler -> processor : processRequest(request)
+activate processor
+
+processor -> controller: create(postItRepository, boardLogger, boardSynchronizer, postItManager)
+activate controller
+
+processor -> controller: undoPostItChange(board, user, row, column)
+
+controller -> sync: createBoardCellLock(boardId, row, column)
+activate sync
+
+sync --> controller: cellLockKey
+deactivate sync
+
+controller -> sync: getBoardCellLock(cellLockKey)
+activate sync
+
+sync --> controller: object
+deactivate sync
+
+note over controller: This "object" represents the object that will be used\nto synchronize the execution flow for the undo process.
+
+controller -> manager: undoPostItChange(board, user,  row, column)
+activate manager
+
+manager -> board: findCell(row, column)
+activate board
+
+board --> manager: boardCell
+deactivate board
+
+manager -> postItProvider: providePostItByCell(boardCell)
+activate postItProvider
+
+postItProvider -> repository: providePostItByCell(boardCell)
+activate repository
+
+repository --> postItProvider: postIt
+deactivate repository
+
+postItProvider --> manager: postIt
+deactivate postItProvider
+
+manager -> postIt: undoLastChange(user)
+activate postIt
+
+note over postIt: The postIt will check if the user that tried to undo\nthe last change is it's owner and also if there is any previous content.
+deactivate postIt
+
+manager --> controller: postIt
+deactivate manager
+
+controller -> repository: save(postIt)
+activate repository
+
+repository --> controller: postIt
+deactivate repository
+
+controller -> logger: logPostItUndo(board, user)
+activate logger
+
+note over logger: The logger service is responsible for both creation and save\nof the created BoardLog,  so it was decided to omit this part.
+
+deactivate logger
+
+controller --> processor: success
+deactivate controller
+
+processor --> handler: success
+deactivate processor
+
+handler --> browser: success
+deactivate handler
+
+browser --> user: display success notification
+
+deactivate browser
+
+@enduml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

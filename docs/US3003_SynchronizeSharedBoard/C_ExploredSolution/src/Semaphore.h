@@ -1,0 +1,1 @@
+int createSemaphore(sem_t **semaphores, int numberSemaphores);

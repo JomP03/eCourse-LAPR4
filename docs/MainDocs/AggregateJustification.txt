@@ -1,0 +1,16 @@
+De forma geral, quando procuarmos identificar um agregado, devemos ter em mente, alguns aspetos cruciais, tais como:
+
+- Identificar os conceitos chave do negócio;
+
+- Definir regras que nos permitam perceber o modo como os conceitos iram interagir entre si;
+
+- Definir os limites transacionais, ou seja, os agregados devem ser desenhados para encapsular e atenuar estes limites;
+
+De forma resumida, procuramos manter objetos relacionados frequentemente dentro de um mesmo agregado, que se relacionaram com o exterior, maioritariamente pela raiz desse agregado.
+
+Dentro do negócio em que a eCourse se enquadra, definimos como agregados principais, os seguintes:
+"CourseAggregate", "ExamAggregate", "TakenExamAggregate", "PostitRecordAggregate", "PostitAggregate", "SharedBoardAggregate", "UserAggregate", "MeetingAggregate" and "ClassAggregate".
+
+Um exemplo que demonstra a aplicação destes princípios de forma clara, é por exemplo, a seleção do agregado "ExamAggregate". Um exame, é um conjunto estruturado de questões fundamentalmente, com alguns atríbutos chave.
+Como não há necessidade haver interação entre estes atríbutos e o mundo "exterior", vamos encapsular estes value objects dentro do agregado Exame, em que este será a raiz.
+Outro exemplo claro, é o caso dos utilizadores da eCourse, de um ponto de vista transacional, não faria sentido encapsular os utilizadores com uma Shared Board, assim sendo, decidimos colocar estes dois conceitos chave em dois agregados distintos, permitindo a manipulação distinta de ambos, e tornando apenas a comunicação entre ambos possível através das suas raízes.
